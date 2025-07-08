@@ -12,3 +12,11 @@ spring:
     properties:
       hibernate:
         dialect: org.hibernate.dialect.MySQL8Dialect
+
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+  swagger-ui:
+    display-request-duration: true
+    operations-sorter: method
+    tags-sorter: alpha
