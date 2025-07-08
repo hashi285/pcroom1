@@ -15,6 +15,4 @@ public class PcRoomController {
     public String hello() {
         return "문혁수?!";
     }
-
-
 }
