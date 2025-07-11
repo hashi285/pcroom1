@@ -21,8 +21,8 @@ public class Seat {
     @Column(nullable = false, length = 45)
     private String seatsIp;
 
-    @Column(nullable = false)
-    private Integer port;
+    @Column(name = "zone_number", nullable = false)
+    private int zoneNumber;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "pcroom_id", nullable = false)
