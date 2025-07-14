@@ -16,7 +16,7 @@ public class IpResult {
     private Long resultId;
 
     @Column(nullable = false)
-    private Boolean results;
+    private Boolean result;
 
     @Column(nullable = false, updatable = false)
     private LocalDateTime time;
