@@ -13,12 +13,13 @@ import java.util.List;
 public class Seat {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "seat_id")
     private Long seatId;
 
-    @Column(nullable = false)
+    @Column(name = "seat_num", nullable = false)
     private Integer seatsNum;
 
-    @Column(nullable = false, length = 45)
+    @Column(name = "seat_ip", nullable = false, length = 45)
     private String seatsIp;
 
     @Column(name = "zone_number", nullable = false)
