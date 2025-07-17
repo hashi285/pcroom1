@@ -30,6 +30,4 @@ public class Pcroom {
 
     @OneToMany(mappedBy = "pcroom", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<IpResult> ipResults;
-
-    // getters, setters
 }
