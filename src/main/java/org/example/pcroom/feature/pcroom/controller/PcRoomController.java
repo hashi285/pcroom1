@@ -31,11 +31,13 @@ public class PcRoomController {
 
 
     @GetMapping("/pc/{pcroomid}")
+    @Operation(summary = "피시방 가동률 확인", description = "피시방 가동률 반환")
     public String getSeats(@PathVariable Long pcroomid) throws Exception {
         return pcRoomService.canUseSeat(pcroomid);
     }
 
     @GetMapping("/pc/{pcroomid}/{is_available}")
+    @Operation(summary = "피시방 다인 이용 자리 추천", description = "다인 이용 추천 Map 형식으로 반환")
     public Map<Integer, List<Integer>> getPcRoomSeats(@PathVariable Long pcroomid, Long is_available) throws Exception {
         return pcRoomService.getIpResult(pcroomid,is_available);
     }
