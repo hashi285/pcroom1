@@ -25,8 +25,8 @@ public class PcRoomService {
 
     /**
      *
-     * @param pcRoomId
-     * @return
+     * @param pcRoomId 조회할 피시방 ID
+     * @return String 형식으로 피시방 가동률  반환
      * @throws Exception
      */
     @Transactional
@@ -43,6 +43,13 @@ public class PcRoomService {
     }
 
 
+    /**
+     *
+     * @param pcRoomId 조회할 피시방 ID
+     * @param is_available 사용자가 사용할 자리
+     * @return 사용자가 사용 가능한 자리 Map 형식으로 반환
+     * @throws Exception
+     */
     @Transactional
     public Map<Integer, List<Integer>> getIpResult(Long pcRoomId, Long is_available) throws Exception {
         List<String> pingResults = pingService.update(pcRoomId); // alive/dead
