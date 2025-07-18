@@ -37,7 +37,7 @@ public class PcRoomController {
     }
 
     @GetMapping("/pc/{pcroomid}/{is_available}")
-    @Operation(summary = "피시방 다인 이용 자리 추천", description = "다인 이용 추천 Map 형식으로 반환")
+    @Operation(summary = "피시방 다인 이용 자리 추천", description = "사용 가능 자리 Map 형식으로 반환")
     public Map<Integer, List<Integer>> getPcRoomSeats(@PathVariable Long pcroomid, Long is_available) throws Exception {
         return pcRoomService.getIpResult(pcroomid,is_available);
     }
