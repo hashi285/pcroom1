@@ -6,4 +6,6 @@ import lombok.RequiredArgsConstructor;
 
 @Getter
 @AllArgsConstructor
-public class SeatsDto {}
+public class SeatsDto {
+    private int zoneNumber;
+}
