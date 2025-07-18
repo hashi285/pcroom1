@@ -33,6 +33,4 @@ public class IpResult {
     protected void onCreate() {
         this.time = LocalDateTime.now();
     }
-
-    // getters, setters
 }
