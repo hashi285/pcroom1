@@ -35,6 +35,4 @@ public class User {
     protected void onCreate() {
         this.createDate = LocalDateTime.now();
     }
-
-    // getters, setters
 }

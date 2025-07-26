@@ -31,6 +31,4 @@ public class Seat {
 
     @OneToMany(mappedBy = "seat", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<IpResult> ipResults;
-
-    // getters, setters
 }
