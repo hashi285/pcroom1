@@ -24,27 +24,39 @@ repositories {
 }
 
 dependencies {
-    // Web
-    implementation 'org.springframework.boot:spring-boot-starter-web'
-    implementation 'org.springframework.boot:spring-boot-starter-web-services'
-    developmentOnly 'org.springframework.boot:spring-boot-devtools'
-    // Lombok
-    annotationProcessor 'org.projectlombok:lombok'
-    compileOnly 'org.projectlombok:lombok'
-    // Test
-    testImplementation 'org.springframework.boot:spring-boot-starter-test'
-    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
-    testImplementation 'org.mockito:mockito-inline:5.2.0'
-    // JPA
-    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
-    runtimeOnly 'com.mysql:mysql-connector-j'
-    implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.2.0'
+    // == Web Layer ==
+    implementation 'org.springframework.boot:spring-boot-starter-web'                 // Spring MVC
+    implementation 'org.springframework.boot:spring-boot-starter-web-services'        // Web Services (SOAP 등)
 
-    // Spring Security
-    implementation 'org.springframework.boot:spring-boot-starter-security'
-    // JWT
-    implementation 'io.jsonwebtoken:jjwt-api:0.11.5'
-    runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.11.5'
+    // == DevTools ==
+    developmentOnly 'org.springframework.boot:spring-boot-devtools'                   // 핫 리로딩 등 개발 편의 기능
+
+    // == Lombok ==
+    compileOnly 'org.projectlombok:lombok'                                            // 코드 축약용 애노테이션
+    annotationProcessor 'org.projectlombok:lombok'                                    // Lombok 애노테이션 처리기
+
+    // == Spring Data JPA ==
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'            // Spring JPA
+    runtimeOnly 'com.mysql:mysql-connector-j'                                         // MySQL 드라이버
+
+    // == Spring Security ==
+    implementation 'org.springframework.boot:spring-boot-starter-security'            // Spring Security 기본 구성
+
+    // == JWT (JSON Web Token) ==
+    implementation 'io.jsonwebtoken:jjwt-api:0.11.5'                                   // JWT API
+    runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.11.5'                                     // JWT 구현체
+
+    // == OAuth2 Client (Social Login) ==
+    implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'       // Google, Kakao, Naver 등 OAuth2 로그인
+
+
+    // == OpenAPI (Swagger) ==
+    implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.2.0'          // Swagger UI + OpenAPI 문서
+
+    // == Test ==
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'            // Spring Boot 테스트
+    testImplementation 'org.mockito:mockito-inline:5.2.0'                              // Mockito (final 클래스 mocking 지원)
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'                      // JUnit 런처
 }
 
 tasks.named('test') {
