@@ -25,9 +25,6 @@ public class User {
     @Column(nullable = false, length = 15)
     private String nickname;
 
-    @Column(nullable = false, length = 255)
-    private String password;
-
     @Column(nullable = false, updatable = false)
     private LocalDateTime createDate;
 
