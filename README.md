@@ -94,3 +94,35 @@ docs: API 명세서 내용 보완
 커밋을 하는 경우 위와 같은 형식으로 한다. 
 
 ---
+# PR 브랜치 이름 규칙
+
+## 1. 브랜치 접두어 + 이슈번호(선택사항) + 설명
+
+| 접두어      | 의미                         | 예시                              |
+| ----------- | ---------------------------- | --------------------------------- |
+| `feature/`  | 새로운 기능 추가              | `feature/login-api`                |
+| `bugfix/`   | 버그 수정                    | `bugfix/fix-nullpointer`           |
+| `hotfix/`   | 긴급 버그 수정               | `hotfix/crash-on-startup`          |
+| `release/`  | 릴리즈 준비                  | `release/v1.2.0`                   |
+| `chore/`    | 기타 잡일(빌드, 설정 변경 등) | `chore/update-dependencies`        |
+
+## 2. 이슈 번호 붙이기 (선택 사항)
+
+- Jira, GitHub Issue 번호 등 이슈 번호를 브랜치명에 포함.
+- 예: `feature/123-login-api`, `bugfix/45-fix-crash`
+
+## 3. 네이밍 규칙
+
+- 소문자 + 하이픈(`-`)만 사용
+- 공백이나 특수문자는 피할 것
+- 간결하고 명확한 설명 작성 
+
+## 4. 예시
+
+```angular2html
+feature/101-add-user-authentication
+bugfix/88-correct-nullpointer-in-service
+hotfix/200-fix-login-crash
+chore/update-gradle-version
+release/v1.5.0
+```
