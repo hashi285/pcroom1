@@ -1,10 +1,11 @@
-package org.example.pcroom.feature.pcroom.entity;
+package org.example.pcroom.feature.user.entity;
 
 
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.example.pcroom.feature.pcroom.entity.Pcroom;
 
 import java.time.LocalDateTime;
 import java.util.List;

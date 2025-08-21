@@ -3,6 +3,7 @@ package org.example.pcroom.feature.pcroom.entity;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+import org.example.pcroom.feature.user.entity.User;
 
 import java.util.List;
 
