@@ -1,6 +1,6 @@
-package org.example.pcroom.feature.pcroom.repository;
+package org.example.pcroom.feature.user.repository;
 
-import org.example.pcroom.feature.pcroom.entity.User;
+import org.example.pcroom.feature.user.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;

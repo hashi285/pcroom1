@@ -2,13 +2,11 @@ package org.example.pcroom.feature.pcroom.service;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import org.example.pcroom.feature.pcroom.dto.IpResultDto;
 import org.example.pcroom.feature.pcroom.dto.SeatsDto;
-import org.example.pcroom.feature.pcroom.entity.Seat;
 import org.example.pcroom.feature.pcroom.repository.IpResultRepository;
 import org.example.pcroom.feature.pcroom.repository.PcroomRepository;
 import org.example.pcroom.feature.pcroom.repository.SeatRepository;
-import org.example.pcroom.feature.pcroom.repository.UserRepository;
+import org.example.pcroom.feature.user.repository.UserRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
