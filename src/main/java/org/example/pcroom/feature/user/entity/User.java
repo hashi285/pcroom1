@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.example.pcroom.feature.pcroom.entity.Pcroom;
 
+import javax.management.relation.Role;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -26,8 +27,14 @@ public class User {
     @Column(nullable = false, length = 15)
     private String nickname;
 
+    @Column()
+    private String password;
+
     @Column(nullable = false, updatable = false)
     private LocalDateTime createDate;
+
+    @Column()
+    private Role role;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Pcroom> pcrooms;
