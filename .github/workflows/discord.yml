@@ -1,0 +1,41 @@
+name: GitHub → Discord Notifications
+
+on:
+  push:
+    branches:
+      - '**'  # 모든 브랜치 push 감지
+  pull_request:
+    types: [closed]  # PR이 닫힐 때 (merge 포함)
+
+jobs:
+  notify:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Notify on Push
+        if: github.event_name == 'push'
+        uses: Ilshidur/action-discord@master
+        with:
+          args: |
+            **📌 New Push Detected!**
+            - Repository: ${{ github.repository }}
+            - Branch: ${{ github.ref_name }}
+            - Author: ${{ github.actor }}
+            - Commit: "${{ github.event.head_commit.message || 'No commit message' }}"
+            - Compare: ${{ github.event.compare || 'No compare link' }}
+        env:
+          DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
+
+      - name: Notify on Merge
+        if: github.event_name == 'pull_request' && github.event.pull_request.merged == true
+        uses: Ilshidur/action-discord@master
+        with:
+          args: |
+            **✅ Pull Request Merged!**
+            - Repository: ${{ github.repository }}
+            - Base Branch: ${{ github.event.pull_request.base.ref }}
+            - Merged From: ${{ github.event.pull_request.head.ref }}
+            - Merged By: ${{ github.actor }}
+            - PR Title: "${{ github.event.pull_request.title || 'No PR title' }}"
+            - PR Link: ${{ github.event.pull_request.html_url || 'No PR link' }}"
+        env:
+          DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
