@@ -5,6 +5,11 @@ spring:
     password: 1234
     driver-class-name: com.mysql.cj.jdbc.Driver
 
+  data:
+    redis:
+      host: localhost
+      port: 6379   # Redis 서버 포트
+
   jpa:
     hibernate:
       ddl-auto: update
@@ -13,6 +18,12 @@ spring:
       hibernate:
         dialect: org.hibernate.dialect.MySQL8Dialect
 
+  config:
+    import: optional:file:.env[.properties]
+
+jwt:
+  secret: ${JWT_SECRET}
+
 springdoc:
   api-docs:
     path: /v3/api-docs
@@ -20,3 +31,7 @@ springdoc:
     display-request-duration: true
     operations-sorter: method
     tags-sorter: alpha
+
+server:
+  address: 0.0.0.0
+  port: 8080
