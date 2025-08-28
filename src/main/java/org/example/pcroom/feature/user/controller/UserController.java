@@ -1,7 +1,7 @@
 package org.example.pcroom.feature.user.controller;
 
 import lombok.RequiredArgsConstructor;
-import org.example.pcroom.feature.auth.dto.LoginRequest;
+import org.example.pcroom.feature.user.dto.LoginRequest;
 import org.example.pcroom.feature.user.dto.SignupRequest;
 import org.example.pcroom.feature.user.dto.SignupResponse;
 import org.example.pcroom.feature.user.service.UserService;
@@ -39,7 +39,7 @@ public class UserController {
             String jwt = jwtUtil.generateToken(auth.getName());
             return ResponseEntity.ok(Map.of("token", jwt));
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("로그인 실패");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("로그인 실패"+ e.getMessage());
         }
     }
 }
