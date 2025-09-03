@@ -2,10 +2,8 @@ package org.example.pcroom.feature.pcroom.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
-import org.example.pcroom.feature.pcroom.dto.SeatsDto;
 import org.example.pcroom.feature.pcroom.service.PcRoomService;
 import org.example.pcroom.feature.pcroom.service.PingService;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.Map;

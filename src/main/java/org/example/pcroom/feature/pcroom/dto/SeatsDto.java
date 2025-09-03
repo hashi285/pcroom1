@@ -2,7 +2,13 @@ package org.example.pcroom.feature.pcroom.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
+
+/**
+ * PC방 정보
+
+ * 주요 필드:
+ * - zonNumber:
+ */
 
 @Getter
 @AllArgsConstructor
