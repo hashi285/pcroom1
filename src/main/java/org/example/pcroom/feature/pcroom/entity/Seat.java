@@ -27,6 +27,9 @@ public class Seat {
     @Column(name = "seat_id")
     private Long seatId;
 
+    @Column()
+    private Long pcroomId;
+
     @Column(name = "seat_num", nullable = false)
     private Integer seatsNum;
 
@@ -38,10 +41,6 @@ public class Seat {
 
     @Column(nullable = false)
     private int y;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "pcroom_id", nullable = false)
-    private Pcroom pcroom;
 
     @OneToMany(mappedBy = "seat", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<IpResult> ipResults;

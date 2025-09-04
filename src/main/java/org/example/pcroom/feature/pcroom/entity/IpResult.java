@@ -25,6 +25,9 @@ public class IpResult {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long resultId;
 
+    @Column()
+    private String seatId;
+
     @Column(nullable = false)
     private Boolean result;
 
@@ -35,9 +38,6 @@ public class IpResult {
     @JoinColumn(name = "pcroom_id", nullable = false)
     private Pcroom pcroom;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "seat_id", nullable = false)
-    private Seat seat;
 
     @PrePersist
     protected void onCreate() {
