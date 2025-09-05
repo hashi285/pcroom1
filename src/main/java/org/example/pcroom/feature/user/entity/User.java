@@ -32,7 +32,7 @@ public class User {
     @Column(nullable = false, length = 50, unique = true)
     private String email;
 
-    @Column(nullable = false, length = 15)
+    @Column( length = 15)
     private String nickname;
 
     @Column(nullable = false)
@@ -42,7 +42,7 @@ public class User {
     private LocalDateTime createDate;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false, length = 20)
+    @Column( length = 20)
     private UserRole role;
 
     @PrePersist
