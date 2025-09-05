@@ -46,7 +46,7 @@ public class SecurityConfig {
                                 "/swagger-ui.html",
                                 "/v3/api-docs/**",
                                 "/v3/api-docs.yaml",
-                                "/auth/**", "/pc/login", "/pc/signup"
+                                "/auth/**", "/pc/login", "/pc/signup","/pc/**"
                         ).permitAll()
                         // 인증 필요 없는 경로
                         // 나머지는 JWT 인증
