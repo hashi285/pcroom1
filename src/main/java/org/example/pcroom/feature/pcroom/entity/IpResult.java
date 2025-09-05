@@ -31,7 +31,7 @@ public class IpResult {
     @Column(nullable = false)
     private Long seatId;
 
-    @Column(nullable = false)
+    @Column()
     private Boolean result;
 
     @Column(nullable = false, updatable = false)

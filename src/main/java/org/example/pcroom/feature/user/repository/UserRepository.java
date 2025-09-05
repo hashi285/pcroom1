@@ -13,8 +13,8 @@ import java.util.Optional;
 public interface UserRepository extends JpaRepository<User, Long> {
     User findByUserId(Long userId);
     List<User> findAll();
-    @Query("SELECT u FROM User u JOIN FETCH u.pcrooms WHERE u.userId = :userId")
-    Optional<User> findByIdWithPcrooms(@Param("userId") Long userId);
+//    @Query("SELECT u FROM User u JOIN FETCH u.pcrooms WHERE u.userId = :userId")
+//    Optional<User> findByIdWithPcrooms(@Param("userId") Long userId);
 
     // 설명 필요
     Optional<User> findByEmail(String email);
