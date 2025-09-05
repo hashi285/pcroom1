@@ -4,10 +4,8 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.example.pcroom.feature.pcroom.entity.Pcroom;
-import javax.management.relation.Role;
+import org.example.pcroom.feature.pcroom.enums.UserRole;
 import java.time.LocalDateTime;
-import java.util.List;
 
 /**
  * 유저 정보
@@ -19,8 +17,6 @@ import java.util.List;
  * - password: 인코딩 비밀번호
  * - createDate: 계정 생성 날짜 / 시간
  * - role: 사용자 role(ADMIN, OWNER, USER)
-
- * 관계:
  */
 
 @Entity
@@ -33,23 +29,21 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long userId;
 
-    @Column(nullable = false, length = 50)
+    @Column(nullable = false, length = 50, unique = true)
     private String email;
 
     @Column(nullable = false, length = 15)
     private String nickname;
 
-    @Column()
+    @Column(nullable = false)
     private String password;
 
     @Column(nullable = false, updatable = false)
     private LocalDateTime createDate;
 
-    @Column()
-    private Role role;
-
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Pcroom> pcrooms;
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false, length = 20)
+    private UserRole role;
 
     @PrePersist
     protected void onCreate() {
