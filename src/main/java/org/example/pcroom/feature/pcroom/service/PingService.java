@@ -26,7 +26,7 @@ import java.util.stream.Collectors;
 public class PingService {
 
     private final PcroomRepository pcroomRepository;  // Pcroom 엔티티 DB 접근용 레포지토리
-    private final SeatRepository seatRepository;      // Seat 엔티티 DB 접근용 레포지토리
+    private final SeatRepository seatRepository;      // SetSeat 엔티티 DB 접근용 레포지토리
     private final IpResultRepository ipResultRepository; // IpResult 엔티티 DB 접근용 레포지토리
 
     // PC방 ID를 기반으로 좌석들의 IP를 Ping하고 결과 저장 후 상태 리스트 반환
@@ -36,7 +36,7 @@ public class PingService {
         // pcroomId에 속한 좌석 리스트 조회 (여기서는 top 한 건만 조회하는 메서드 사용)
         List<Seat> seats = seatRepository.findTopByPcroomId(pcroomId);
 
-        // 좌석 리스트를 IP → Seat 매핑 Map으로 변환
+        // 좌석 리스트를 IP → SetSeat 매핑 Map으로 변환
         Map<String, Seat> ipToSeat = mapIpToSeat(seats);
 
         // 좌석 리스트에서 IP만 추출
@@ -82,7 +82,7 @@ public class PingService {
             // 각 IP마다 Ping을 수행하는 Callable 제출
             futures.add(executor.submit(() -> {
                 boolean isAlive = ping(ip);            // 실제 Ping 수행
-                Seat seat = ipToSeat.get(ip);          // IP → Seat 매핑
+                Seat seat = ipToSeat.get(ip);          // IP → SetSeat 매핑
 
                 if (seat != null) {
                     saveIpResult(isAlive, pcroom, seat); // 결과 저장

@@ -1,12 +1,13 @@
 package org.example.pcroom.feature.pcroom.entity;
 
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
+
+import java.util.Objects;
 
 /**
  * PC방 정보
-
+ * <p>
  * 주요 필드:
  * - pcroomId: PK, 자동 생성
  * - userId: userId FK
@@ -16,10 +17,13 @@ import lombok.Setter;
  */
 
 @Entity
-@Getter
-@Setter
 @Table(name = "pcrooms")
+@Builder(access = AccessLevel.PRIVATE)
+@Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class Pcroom {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long pcroomId;
@@ -38,4 +42,22 @@ public class Pcroom {
 
     @Column(nullable = false)
     private int height;
+
+
+    public static Pcroom register(
+        Long userId, String nameOfPcroom, int port, int width, int height) {
+
+        Objects.requireNonNull(userId, "null 넣지마라 개쉐이야");
+        Objects.requireNonNull(nameOfPcroom, "null 넣지마라 개쉐이야");
+
+
+        return Pcroom.builder()
+            .userId(userId)
+            .nameOfPcroom(nameOfPcroom)
+            .port(port)
+            .width(width)
+            .height(height)
+            .build();
+    }
+
 }

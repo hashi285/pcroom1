@@ -22,8 +22,8 @@ public interface PcroomRepository extends JpaRepository<Pcroom, Long> {
 
 //// → 즉, 이 메서드는 pcroomId로 특정 PC방을 찾아올 뿐만 아니라,
 ////    PC방에 있는 좌석 목록(seats)도 함께 로딩해서 N+1 문제를 방지한다.
-//@Query("select s from Seat s where s.pcroom.pcroomId = :pcroomId")
-//    List<Seat> findSeatsByPcroomId(@Param("pcroomId") Long pcroomId);
+//@Query("select s from SetSeat s where s.pcroom.pcroomId = :pcroomId")
+//    List<SetSeat> findSeatsByPcroomId(@Param("pcroomId") Long pcroomId);
 
 //    @Query("SELECT p.nameOfPcroom FROM Pcroom p WHERE p.pcroomId = :pcroomId") // 예시로 name 필드
 //    String findPcroomNameById(@Param("pcroomId") Long pcroomId);

@@ -2,11 +2,12 @@ package org.example.pcroom.feature.pcroom.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
+import org.example.pcroom.feature.pcroom.dto.PcroomDto;
+import org.example.pcroom.feature.pcroom.entity.Pcroom;
 import org.example.pcroom.feature.pcroom.service.PcRoomService;
 import org.example.pcroom.feature.pcroom.service.PingService;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
-import java.util.Map;
 
 @RequestMapping("pc")
 @RestController
@@ -39,4 +40,25 @@ public class PcRoomController {
 //    public Map<Integer, List<Integer>> getPcRoomSeats(@PathVariable Long pcroomid, Long is_available) throws Exception {
 //        return pcRoomService.getIpResult(pcroomid,is_available);
 //    }
+
+    // GET | http://수혁군서버.com/api/pcrooms/1 -> pc 상세조회
+    // POST |http://수혁군서버.com/api/pcrooms/ -> pc 새로등록
+    @PostMapping("/set_pcroom")
+    @Operation(summary = "피시방 저장")
+    public PcroomDto.ReadPcRoomResponse setSeat(@RequestBody PcroomDto.CreatePcRoomRequest request) {
+
+//        Pcroom pcroom = pcRoomService.registerNewPcroom(request);
+
+        // 여기서 Response 로 변환
+//        var response = new PcroomDto.ReadPcRoomResponse(
+//                room.getPcroomId(),
+//                1L,
+//                room.getNameOfPcroom(),
+//                room.getPort(),
+//                room.getWidth(),
+//                room.getHeight()
+//        );
+
+        return pcRoomService.registerNewPcroom(request);
+    }
 }
