@@ -2,11 +2,16 @@ package org.example.pcroom.feature.pcroom.service;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import org.example.pcroom.feature.pcroom.dto.SeatsDto;
+import org.example.pcroom.feature.pcroom.dto.PcroomDto;
+import org.example.pcroom.feature.pcroom.entity.Pcroom;
 import org.example.pcroom.feature.pcroom.repository.IpResultRepository;
 import org.example.pcroom.feature.pcroom.repository.PcroomRepository;
 import org.example.pcroom.feature.pcroom.repository.SeatRepository;
 import org.example.pcroom.feature.user.repository.UserRepository;
+import org.example.pcroom.feature.user.service.CustomUserDetailsService;
+import org.example.pcroom.global.config.security.CustomUserDetails;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -87,5 +92,33 @@ public class PcRoomService {
 //        return result;
 //    }
 
+
+    //피시방 저장
+    @Transactional
+    public PcroomDto.ReadPcRoomResponse registerNewPcroom(PcroomDto.CreatePcRoomRequest request) {
+
+//        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+//        CustomUserDetails principal = (CustomUserDetails) authentication.getPrincipal();
+//        Long currentUserId = principal.getUserId();
+        var pcroom = Pcroom.register(
+                6L,
+            request.getNameOfPcroom(),
+            request.getPort(),
+            request.getWidth(),
+            request.getHeight()
+        );
+        pcroomRepository.save(pcroom);
+
+        var response = new PcroomDto.ReadPcRoomResponse(
+                pcroom.getPcroomId(),
+                6L,
+                pcroom.getNameOfPcroom(),
+                pcroom.getPort(),
+                pcroom.getWidth(),
+                pcroom.getHeight()
+        );
+
+        return response;
+    }
 
 }
