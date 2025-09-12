@@ -6,7 +6,6 @@ import org.example.pcroom.feature.pcroom.dto.PcroomDto;
 import org.example.pcroom.feature.pcroom.dto.SeatsDto;
 import org.example.pcroom.feature.pcroom.entity.Pcroom;
 import org.example.pcroom.feature.pcroom.entity.Seat;
-import org.example.pcroom.feature.pcroom.repository.IpResultRepository;
 import org.example.pcroom.feature.pcroom.repository.PcroomRepository;
 import org.example.pcroom.feature.pcroom.repository.SeatRepository;
 import org.springframework.stereotype.Service;
