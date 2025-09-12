@@ -36,5 +36,4 @@ public class PcroomDto {
 
         private final int height;
     }
-
 }

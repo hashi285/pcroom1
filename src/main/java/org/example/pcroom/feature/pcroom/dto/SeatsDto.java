@@ -13,5 +13,9 @@ import lombok.Getter;
 @Getter
 @AllArgsConstructor
 public class SeatsDto {
-    private int zoneNumber;
+    private String nameOfPcroom;
+    private Integer seatsNum;
+    private String seatsIp;
+    private int x;
+    private int y;
 }

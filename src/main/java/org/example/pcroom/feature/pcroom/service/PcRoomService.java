@@ -3,26 +3,20 @@ package org.example.pcroom.feature.pcroom.service;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.example.pcroom.feature.pcroom.dto.PcroomDto;
+import org.example.pcroom.feature.pcroom.dto.SeatsDto;
 import org.example.pcroom.feature.pcroom.entity.Pcroom;
+import org.example.pcroom.feature.pcroom.entity.Seat;
 import org.example.pcroom.feature.pcroom.repository.IpResultRepository;
 import org.example.pcroom.feature.pcroom.repository.PcroomRepository;
 import org.example.pcroom.feature.pcroom.repository.SeatRepository;
-import org.example.pcroom.feature.user.repository.UserRepository;
-import org.example.pcroom.feature.user.service.CustomUserDetailsService;
-import org.example.pcroom.global.config.security.CustomUserDetails;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
-
 import java.util.*;
 
 @Service
 @RequiredArgsConstructor
 public class PcRoomService {
-    private final UserRepository userRepository;
     private final PingService pingService;
     private final PcroomRepository pcroomRepository;
-    private final IpResultRepository ipResultRepository;
     private final SeatRepository seatRepository;
 
 
@@ -109,7 +103,7 @@ public class PcRoomService {
         );
         pcroomRepository.save(pcroom);
 
-        var response = new PcroomDto.ReadPcRoomResponse(
+        return new PcroomDto.ReadPcRoomResponse(
                 pcroom.getPcroomId(),
                 6L,
                 pcroom.getNameOfPcroom(),
@@ -117,8 +111,25 @@ public class PcRoomService {
                 pcroom.getWidth(),
                 pcroom.getHeight()
         );
-
-        return response;
     }
+    @Transactional
+    public List<SeatsDto> registerNewSeat(SeatsDto seatsDto) {
 
+        String name = seatsDto.getNameOfPcroom();
+        Optional<Pcroom> pcroomOpt = pcroomRepository.findByNameOfPcroom(name);
+        if (pcroomOpt.isPresent()) {
+            Long pcroomId = pcroomOpt.get().getPcroomId();
+        }
+
+        var seat = Seat.register(
+                seatsDto.getPcroomId(),
+                seatsDto.getSeatsNum(),
+                seatsDto.getSeatsIp(),
+                seatsDto.getX(),
+                seatsDto.getY()
+        );
+        seatRepository.save(seat);
+
+        return null;
+    }
 }
