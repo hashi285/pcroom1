@@ -3,6 +3,7 @@ package org.example.pcroom.feature.pcroom.controller;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import org.example.pcroom.feature.pcroom.dto.PcroomDto;
+import org.example.pcroom.feature.pcroom.dto.SeatsDto;
 import org.example.pcroom.feature.pcroom.entity.Pcroom;
 import org.example.pcroom.feature.pcroom.service.PcRoomService;
 import org.example.pcroom.feature.pcroom.service.PingService;
@@ -45,20 +46,15 @@ public class PcRoomController {
     // POST |http://수혁군서버.com/api/pcrooms/ -> pc 새로등록
     @PostMapping("/set_pcroom")
     @Operation(summary = "피시방 저장")
-    public PcroomDto.ReadPcRoomResponse setSeat(@RequestBody PcroomDto.CreatePcRoomRequest request) {
-
-//        Pcroom pcroom = pcRoomService.registerNewPcroom(request);
-
-        // 여기서 Response 로 변환
-//        var response = new PcroomDto.ReadPcRoomResponse(
-//                room.getPcroomId(),
-//                1L,
-//                room.getNameOfPcroom(),
-//                room.getPort(),
-//                room.getWidth(),
-//                room.getHeight()
-//        );
+    public PcroomDto.ReadPcRoomResponse setPcroom(@RequestBody PcroomDto.CreatePcRoomRequest request) {
 
         return pcRoomService.registerNewPcroom(request);
+    }
+
+    @PostMapping
+    @Operation(summary = "자리 저장")
+    public List<SeatsDto> setSeats(@RequestBody SeatsDto seatsDto) {
+
+        return pcRoomService.registerNewSeat(seatsDto);
     }
 }

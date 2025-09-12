@@ -28,5 +28,10 @@ public interface PcroomRepository extends JpaRepository<Pcroom, Long> {
 //    @Query("SELECT p.nameOfPcroom FROM Pcroom p WHERE p.pcroomId = :pcroomId") // 예시로 name 필드
 //    String findPcroomNameById(@Param("pcroomId") Long pcroomId);
 
+
 Pcroom findByPcroomId(Long pcroomId);
+
+    Optional<Pcroom> findByNameOfPcroom(String nameOfPcroom);
 }
+
+
