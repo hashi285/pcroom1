@@ -2,7 +2,6 @@ package org.example.pcroom.feature.pcroom.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
-
 import java.util.Objects;
 
 /**
