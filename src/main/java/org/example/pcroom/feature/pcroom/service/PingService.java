@@ -1,76 +1,71 @@
 package org.example.pcroom.feature.pcroom.service;
 
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.example.pcroom.feature.pcroom.entity.IpResult;
-import org.example.pcroom.feature.pcroom.entity.Pcroom;
 import org.example.pcroom.feature.pcroom.entity.Seat;
+import org.example.pcroom.feature.pcroom.entity.Utilization;
 import org.example.pcroom.feature.pcroom.repository.IpResultRepository;
-import org.example.pcroom.feature.pcroom.repository.PcroomRepository;
 import org.example.pcroom.feature.pcroom.repository.SeatRepository;
+import org.example.pcroom.feature.pcroom.repository.UtilizationRepository;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import java.net.InetAddress;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.*;
+import java.time.LocalDateTime;
+import java.util.*;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-@Slf4j
 @Service
 @RequiredArgsConstructor
 public class PingService {
+    private final UtilizationRepository utilizationRepository;
+    private final SeatRepository seatRepository;
+    private final IpResultRepository ipResultRepository;
+    private final List<IpResult> buffer = Collections.synchronizedList(new ArrayList<>());
 
-    private final PcroomRepository pcroomRepository;  // Pcroom 엔티티 DB 접근용 레포지토리
-    private final SeatRepository seatRepository;      // SetSeat 엔티티 DB 접근용 레포지토리
-    private final IpResultRepository ipResultRepository; // IpResult 엔티티 DB 접근용 레포지토리
 
-    // PC방 ID를 기반으로 좌석들의 IP를 Ping하고 결과 저장 후 상태 리스트 반환
     @Transactional
-    public List<String> update(Long pcroomId) throws Exception {
+    public double ping(Long pcroomId) throws ExecutionException, InterruptedException {
 
-        // pcroomId에 속한 좌석 리스트 조회 (여기서는 top 한 건만 조회하는 메서드 사용)
-        List<Seat> seats = seatRepository.findTopByPcroomId(pcroomId);
+       Optional<Utilization> utilization =  utilizationRepository.findTopByPcroomIdOrderByTimeDesc(pcroomId);
 
-        // 좌석 리스트를 IP → SetSeat 매핑 Map으로 변환
-        Map<String, Seat> ipToSeat = mapIpToSeat(seats);
+// DB에 기록이 없으면 고정값, 있으면 DB값 사용
+        LocalDateTime lastTime = utilization
+                .map(Utilization::getTime)
+                .orElse(LocalDateTime.of(2024, 9, 14, 15, 30, 0));
 
-        // 좌석 리스트에서 IP만 추출
-        List<String> ipList = extractIpList(seats);
+        LocalDateTime now = LocalDateTime.now();
+// 현재 시간과 비교
+        if (lastTime.isBefore(now.minusMinutes(1))) {
 
-        // pcroom 가져옴
-        Pcroom pcrooms = pcroomRepository.findByPcroomId(pcroomId);
+           List<Seat> seat = seatRepository.findByPcroomId(pcroomId);
 
-        // 병렬로 Ping 수행하고 결과 수집
-        return performParallelPing(ipList, ipToSeat, pcrooms);
-    }
+           List<String> list = seat.stream()
+                   .map(Seat::getSeatsIp)
+                   .toList();
 
-//    // pcroomId로 Pcroom 객체와 좌석 정보를 함께 조회
-//    private Pcroom fetchPcroomWithSeats(Long pcroomId) {
-//        pcroomRepository.findByPcroomId(pcroomId);
-//
-//        return pcroomRepository.findByPcroomIdWithSeat(pcroomId)
-//                .orElseThrow(() -> new IllegalArgumentException("PC방 없음: " + pcroomId));
-//    }
 
-    // 좌석 리스트를 IP를 키로 하는 Map으로 변환
-    private Map<String, Seat> mapIpToSeat(List<Seat> seats) {
-        return seats.stream()
-                .collect(Collectors.toMap(Seat::getSeatsIp, Function.identity()));
-    }
+           // 좌석 리스트를 IP → SetSeat 매핑 Map으로 변환
+           Map<String, Seat> ipToSeat = seat.stream()
+                   .collect(Collectors.toMap(Seat::getSeatsIp, Function.identity()));
+            System.out.println("성공");
 
-    // 좌석 리스트에서 IP만 추출하여 리스트로 반환
-    private List<String> extractIpList(List<Seat> seats) {
-        return seats.stream()
-                .map(Seat::getSeatsIp)
-                .toList();
+           return performParallelPing(list, ipToSeat, pcroomId, now);
+
+       } else {
+            System.out.println("실패");
+           return utilization.get().getUtilization();
+       }
+
     }
 
     // IP 리스트를 병렬로 Ping 수행하고, 좌석 상태 저장 후 결과 문자열 리스트 반환
-    private List<String> performParallelPing(List<String> ipList, Map<String, Seat> ipToSeat, Pcroom pcroom) throws InterruptedException, ExecutionException {
+    private double performParallelPing(List<String> ipList, Map<String, Seat> ipToSeat, Long pcroomId, LocalDateTime now) throws InterruptedException, ExecutionException {
         ExecutorService executor = Executors.newFixedThreadPool(ipList.size()); // 병렬 실행을 위한 스레드 풀
 
         List<Future<String>> futures = new ArrayList<>(); // Ping 결과 Future 리스트
@@ -84,7 +79,7 @@ public class PingService {
                 Seat seat = ipToSeat.get(ip);          // IP → SetSeat 매핑
 
                 if (seat != null) {
-                    saveIpResult(isAlive, pcroom, seat); // 결과 저장
+                    saveIpResult(isAlive, pcroomId, seat); // 결과 저장
                 }
 
                 if (isAlive) {
@@ -93,7 +88,7 @@ public class PingService {
                     deadCount.incrementAndGet();      // 죽었으면 카운트 증가
                 }
 
-                return isAlive ? "alive" : "dead";    // 결과 문자열 반환
+                return isAlive ? "1" : "0";    // 결과 문자열 반환
             }));
         }
 
@@ -102,10 +97,7 @@ public class PingService {
 
         executor.shutdown(); // 스레드 풀 종료
 
-        // 결과 카운트 로그 출력
-        logResultCounts(aliveCount.get(), deadCount.get());
-
-        return results; // 결과 문자열 리스트 반환
+        return utilization(results, pcroomId, now); // 가동률 반환
     }
 
     // 주어진 IP로 실제 Ping 수행
@@ -114,12 +106,12 @@ public class PingService {
     }
 
     // Ping 결과를 IpResult 엔티티에 저장
-    private void saveIpResult(boolean isAlive, Pcroom pcroom, Seat seat) {
+    private void saveIpResult(boolean isAlive, Long pcroomId, Seat seat) {
         IpResult ipResult = new IpResult();
         ipResult.setResult(isAlive);  // 결과 저장
-        ipResult.setPcroomId(seat.getPcroomId());  // PC방 정보 저장
+        ipResult.setPcroomId(pcroomId); // PC방 아이디 저장
         ipResult.setSeatId(seat.getSeatId());    // 좌석 정보 저장
-        ipResultRepository.save(ipResult); // DB 저장
+        buffer.add(ipResult);
     }
 
     // Future 리스트에서 결과 문자열 수집
@@ -131,8 +123,23 @@ public class PingService {
         return results;
     }
 
-    // alive / dead 좌석 수를 콘솔에 출력
-    private void logResultCounts(int alive, int dead) {
-        System.out.println("실행 : " + alive + "  미실행 : " + dead);
+    private double utilization(List<String> utilization,Long pcroomId, LocalDateTime now ){ // 가동률 반환
+        double sum = 0;
+        for (String a :utilization){
+            if (a.equals("1")){
+                sum++;
+            }
+        }
+        double result = Math.round((sum / utilization.size() * 100.0) * 100) / 100.0;
+        Utilization utilization1 = new Utilization();
+        utilization1.setUtilization(result);
+        utilization1.setTime(now);
+        utilization1.setPcroomId(pcroomId);
+        utilizationRepository.save(utilization1);;
+        Long id = utilization1.getUtilizationId();
+        buffer.forEach(ipResult -> ipResult.setUtilizationId(id));
+        ipResultRepository.saveAll(buffer);
+        buffer.clear();
+        return result;
     }
 }

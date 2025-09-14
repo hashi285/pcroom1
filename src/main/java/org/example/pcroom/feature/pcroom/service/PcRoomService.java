@@ -26,16 +26,10 @@ public class PcRoomService {
      * @throws Exception
      */
     @Transactional
-    public String canUseSeat(Long pcRoomId) throws Exception {
-        List<String> list = pingService.update(pcRoomId);
-        float alive = 0;
-        for (String ip : list) {
-            if(ip.equals("alive")) alive++;
-        }
-        float size = list.size();
-        float percentage = (alive / size) * 100;
+    public double canUseSeat(Long pcRoomId) throws Exception {
+        pingService.ping(pcRoomId);
 
-        return String.format("%.1f", percentage);
+        return pingService.ping(pcRoomId);
     }
 
 //
@@ -121,7 +115,7 @@ public class PcRoomService {
         }
 
         var seat = Seat.register(
-                seatsDto.getPcroomId(),
+                Long.valueOf(seatsDto.getSeatsNum()),
                 seatsDto.getSeatsNum(),
                 seatsDto.getSeatsIp(),
                 seatsDto.getX(),
