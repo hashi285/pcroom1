@@ -3,7 +3,6 @@ package org.example.pcroom.feature.pcroom.entity;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
-import java.time.LocalDateTime;
 
 /**
  * ip 검색 결과
@@ -26,19 +25,14 @@ public class IpResult {
     private Long resultId;
 
     @Column(nullable = false)
+    private Long seatId;
+
+    @Column(nullable = false)
+    private Boolean result;
+
+    @Column(nullable = false)
     private Long pcroomId;
 
     @Column(nullable = false)
-    private Long seatId;
-
-    @Column()
-    private Boolean result;
-
-    @Column(nullable = false, updatable = false)
-    private LocalDateTime time;
-
-    @PrePersist
-    protected void onCreate() {
-        this.time = LocalDateTime.now();
-    }
+    private Long utilizationId;
 }
