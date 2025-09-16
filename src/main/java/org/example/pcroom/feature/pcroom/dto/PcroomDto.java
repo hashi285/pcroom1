@@ -13,8 +13,6 @@ public class PcroomDto {
     public static class ReadPcRoomResponse{
         private Long pcroomId;
 
-        private Long userId;
-
         private String nameOfPcroom;
 
         private int port;
