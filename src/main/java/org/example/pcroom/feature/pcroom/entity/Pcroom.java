@@ -27,9 +27,6 @@ public class Pcroom {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long pcroomId;
 
-    @Column(nullable = false)
-    private Long userId;
-
     @Column(nullable = false, length = 50)
     private String nameOfPcroom;
 
@@ -44,14 +41,11 @@ public class Pcroom {
 
 
     public static Pcroom register(
-        Long userId, String nameOfPcroom, int port, int width, int height) {
-
-        Objects.requireNonNull(userId, "null 넣지마라 개쉐이야");
+         String nameOfPcroom, int port, int width, int height) {
         Objects.requireNonNull(nameOfPcroom, "null 넣지마라 개쉐이야");
 
 
         return Pcroom.builder()
-            .userId(userId)
             .nameOfPcroom(nameOfPcroom)
             .port(port)
             .width(width)

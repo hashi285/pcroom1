@@ -3,6 +3,7 @@ package org.example.pcroom.feature.pcroom.controller;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import org.example.pcroom.feature.pcroom.dto.PcroomDto;
+import org.example.pcroom.feature.pcroom.dto.PingUtilizationDto;
 import org.example.pcroom.feature.pcroom.dto.SeatsDto;
 import org.example.pcroom.feature.pcroom.service.PcRoomService;
 import org.example.pcroom.feature.pcroom.service.PingService;
@@ -17,10 +18,10 @@ public class PcRoomController {
     private final PingService pingService;
 
 
-    @GetMapping("/pc/{pcroomid}")
+    @PostMapping("/Utilization")
     @Operation(summary = "피시방 가동률 확인", description = "피시방 가동률 반환")
-    public double getSeats(@PathVariable Long pcroomid) throws Exception {
-        return pingService.ping(pcroomid);
+    public PingUtilizationDto getSeats(@RequestBody Long pcroomId) throws Exception {
+        return pcRoomService.canUseSeat(pcroomId);
     }
 
 //    @GetMapping("/pc/{pcroomid}/{is_available}")

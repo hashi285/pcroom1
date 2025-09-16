@@ -3,6 +3,7 @@ package org.example.pcroom.feature.pcroom.service;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.example.pcroom.feature.pcroom.dto.PcroomDto;
+import org.example.pcroom.feature.pcroom.dto.PingUtilizationDto;
 import org.example.pcroom.feature.pcroom.dto.SeatsDto;
 import org.example.pcroom.feature.pcroom.entity.Pcroom;
 import org.example.pcroom.feature.pcroom.entity.Seat;
@@ -26,10 +27,16 @@ public class PcRoomService {
      * @throws Exception
      */
     @Transactional
-    public double canUseSeat(Long pcRoomId) throws Exception {
-        pingService.ping(pcRoomId);
+    public PingUtilizationDto canUseSeat(Long pcRoomId) throws Exception {
+        double utilization = pingService.ping(pcRoomId);
+        Pcroom pcroom = pcroomRepository.findByPcroomId(pcRoomId);
+        String name = pcroom.getNameOfPcroom();
 
-        return pingService.ping(pcRoomId);
+        return new PingUtilizationDto(
+                pcRoomId,
+                name,
+                utilization
+        );
     }
 
 //
@@ -84,11 +91,7 @@ public class PcRoomService {
     @Transactional
     public PcroomDto.ReadPcRoomResponse registerNewPcroom(PcroomDto.CreatePcRoomRequest request) {
 
-//        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-//        CustomUserDetails principal = (CustomUserDetails) authentication.getPrincipal();
-//        Long currentUserId = principal.getUserId();
         var pcroom = Pcroom.register(
-                6L,
             request.getNameOfPcroom(),
             request.getPort(),
             request.getWidth(),
@@ -98,13 +101,14 @@ public class PcRoomService {
 
         return new PcroomDto.ReadPcRoomResponse(
                 pcroom.getPcroomId(),
-                6L,
                 pcroom.getNameOfPcroom(),
                 pcroom.getPort(),
                 pcroom.getWidth(),
                 pcroom.getHeight()
         );
     }
+
+    // 자리 저장
     @Transactional
     public List<SeatsDto> registerNewSeat(SeatsDto seatsDto) {
 
