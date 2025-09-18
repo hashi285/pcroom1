@@ -31,6 +31,9 @@ public class Pcroom {
     private String nameOfPcroom;
 
     @Column(nullable = false)
+    private Integer seatCount;
+
+    @Column(nullable = false)
     private int port;
 
     @Column(nullable = false)
