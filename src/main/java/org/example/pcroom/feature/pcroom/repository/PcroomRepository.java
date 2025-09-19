@@ -11,7 +11,7 @@ import java.util.Optional;
 @Repository
 public interface PcroomRepository extends JpaRepository<Pcroom, Long> {
 
-    Pcroom findByPcroomId(Long pcroomId);
+    Optional<Pcroom> findByPcroomId(Long pcroomId);
 
     Optional<Pcroom> findByNameOfPcroom(String nameOfPcroom);
 

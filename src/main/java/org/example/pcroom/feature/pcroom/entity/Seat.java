@@ -17,9 +17,8 @@ import lombok.*;
 @Entity
 @Getter
 @Setter
-@Builder(access = AccessLevel.PRIVATE)
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
-@AllArgsConstructor(access = AccessLevel.PRIVATE)
+@NoArgsConstructor()
+@AllArgsConstructor()
 @Table(name = "seats")
 public class Seat {
     @Id
@@ -41,18 +40,4 @@ public class Seat {
 
     @Column(nullable = false)
     private int y;
-
-
-    public static Seat register(
-             Long pcroomId, Integer seatsNum, String seatsIp, int x, int y) {
-
-
-        return Seat.builder()
-                .pcroomId(pcroomId)
-                .seatsNum(seatsNum)
-                .seatsIp(seatsIp)
-                .x(x)
-                .y(y)
-                .build();
-    }
 }
