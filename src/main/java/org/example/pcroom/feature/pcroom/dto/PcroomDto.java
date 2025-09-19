@@ -3,10 +3,17 @@ package org.example.pcroom.feature.pcroom.dto;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import lombok.Setter;
+import org.example.pcroom.feature.pcroom.entity.Pcroom;
+import org.hibernate.id.IncrementGenerator;
 
 @Getter
+@Setter
 @AllArgsConstructor
 public class PcroomDto {
+
+    private String nameOfPcroom;
+    private int seatCount;
 
     @Getter
     @AllArgsConstructor
@@ -38,4 +45,11 @@ public class PcroomDto {
 
         private final int height;
     }
+
+
+    public static PcroomDto fromEntity(Pcroom pcroom) {
+        return new PcroomDto(
+                pcroom.getNameOfPcroom(),
+                pcroom.getSeatCount()
+     ); }
 }

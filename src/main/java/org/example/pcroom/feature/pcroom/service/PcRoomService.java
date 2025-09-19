@@ -88,4 +88,16 @@ public class PcRoomService {
         seatRepository.saveAll(seats);
         return null;
     }
+
+    /**
+     * 피시방 검색
+     * @param name
+     * @return
+     */
+    @Transactional
+    public List<PcroomDto> searchPcrooms(String name) {
+        return pcroomRepository.findByNameOfPcroomContaining(name).stream()
+                .map(PcroomDto::fromEntity)
+                .toList();
+    }
 }
