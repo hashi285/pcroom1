@@ -10,6 +10,7 @@ import org.example.pcroom.feature.pcroom.service.PingService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 
 @RequestMapping("pc")
 @RestController
@@ -42,11 +43,28 @@ public class PcRoomController {
         return pcRoomService.registerNewPcroom(request);
     }
 
+    /**
+     * 피시방 좌석 저장
+     * @param seatsDtos
+     * @return
+     */
     @PostMapping("/seats")
     @Operation(summary = "피시방 좌석 저장")
     public ResponseEntity<List<SeatsDto>> registerSeats(@RequestBody List<SeatsDto> seatsDtos) {
 
         List<SeatsDto> savedSeats = pcRoomService.registerNewSeat(seatsDtos);
         return ResponseEntity.ok(savedSeats);
+    }
+
+    /**
+     * 피시방 검색
+     * @param name
+     * @return
+     */
+    @GetMapping("/search")
+    @Operation(summary = "피시방 LIKE 검색", description = "검색 단어가 들어간 피시방을 반환한다.")
+    public ResponseEntity<List<PcroomDto>> searchPcrooms(@RequestParam String name){
+        List<PcroomDto> result = pcRoomService.searchPcrooms(name);
+        return ResponseEntity.ok(result);
     }
 }
