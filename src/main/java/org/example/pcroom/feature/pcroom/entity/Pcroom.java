@@ -44,12 +44,13 @@ public class Pcroom {
 
 
     public static Pcroom register(
-         String nameOfPcroom, int port, int width, int height) {
+         String nameOfPcroom, Integer seatCount, int port, int width, int height) {
         Objects.requireNonNull(nameOfPcroom, "null 넣지마라 개쉐이야");
 
 
         return Pcroom.builder()
             .nameOfPcroom(nameOfPcroom)
+            .seatCount(seatCount)
             .port(port)
             .width(width)
             .height(height)

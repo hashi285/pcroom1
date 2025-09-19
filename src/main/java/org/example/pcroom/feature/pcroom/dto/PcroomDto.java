@@ -15,6 +15,8 @@ public class PcroomDto {
 
         private String nameOfPcroom;
 
+        private Integer seatCount;
+
         private int port;
 
         private int width;
@@ -27,6 +29,8 @@ public class PcroomDto {
     public static class CreatePcRoomRequest{
 
         private final String nameOfPcroom;
+
+        private final Integer seatCount;
 
         private final int port;
 

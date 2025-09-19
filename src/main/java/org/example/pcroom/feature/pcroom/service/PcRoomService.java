@@ -21,7 +21,6 @@ public class PcRoomService {
 
 
     /**
-     *
      * @param pcRoomId 조회할 피시방 ID
      * @return String 형식으로 피시방 가동률  반환
      * @throws Exception
@@ -29,8 +28,8 @@ public class PcRoomService {
     @Transactional
     public PingUtilizationDto canUseSeat(Long pcRoomId) throws Exception {
         double utilization = pingService.ping(pcRoomId);
-        Pcroom pcroom = pcroomRepository.findByPcroomId(pcRoomId);
-        String name = pcroom.getNameOfPcroom();
+        Optional<Pcroom> pcroom = pcroomRepository.findByPcroomId(pcRoomId);
+        String name = pcroom.get().getNameOfPcroom();
 
         return new PingUtilizationDto(
                 pcRoomId,
@@ -39,94 +38,54 @@ public class PcRoomService {
         );
     }
 
-//
-//    /**
-//     *
-//     * @param pcRoomId 조회할 피시방 ID
-//     * @param is_available 사용자가 사용할 자리
-//     * @return 사용자가 사용 가능한 자리 Map 형식으로 반환
-//     * @throws Exception
-//     */
-//    @Transactional
-//    public Map<Integer, List<Integer>> getIpResult(Long pcRoomId, Long is_available) throws Exception {
-//        List<String> pingResults = pingService.update(pcRoomId); // alive/dead
-//        List<SeatsDto> seats = seatRepository.findSeatsByPcroomId(pcRoomId); // zoneNumber 정보
-//
-//        // zone 별 인덱스 리스트 구성
-//        Map<Integer, List<Integer>> zoneToIndexes = new HashMap<>();
-//        for (int i = 0; i < pingResults.size(); i++) {
-//            int zone = seats.get(i).getZoneNumber();
-//            zoneToIndexes.computeIfAbsent(zone, k -> new ArrayList<>()).add(i);
-//        }
-//
-//        Map<Integer, List<Integer>> result = new HashMap<>();
-//
-//        for (Map.Entry<Integer, List<Integer>> entry : zoneToIndexes.entrySet()) {
-//            int zone = entry.getKey();
-//            List<Integer> indexes = entry.getValue();
-//
-//            int count = 0;
-//            for (int i = 0; i < indexes.size(); i++) {
-//                int idx = indexes.get(i);
-//                if ("dead".equals(pingResults.get(idx))) {
-//                    count++;
-//                    if (count == is_available) {
-//                        // 조건 만족: dead인 인덱스를 전부 모음
-//                        List<Integer> deadIndexes = indexes.stream()
-//                                .filter(j -> "dead".equals(pingResults.get(j)))
-//                                .toList();
-//                        result.put(zone, deadIndexes);
-//                        break;
-//                    }
-//                } else {
-//                    count = 0;
-//                }
-//            }
-//        }
-//        return result;
-//    }
-
-
-    //피시방 저장
+    /**
+     * 피시방 저장
+     *
+     * @param request
+     * @return
+     */
     @Transactional
     public PcroomDto.ReadPcRoomResponse registerNewPcroom(PcroomDto.CreatePcRoomRequest request) {
 
         var pcroom = Pcroom.register(
-            request.getNameOfPcroom(),
-            request.getPort(),
-            request.getWidth(),
-            request.getHeight()
+                request.getNameOfPcroom(),
+                request.getSeatCount(),
+                request.getPort(),
+                request.getWidth(),
+                request.getHeight()
         );
         pcroomRepository.save(pcroom);
 
         return new PcroomDto.ReadPcRoomResponse(
                 pcroom.getPcroomId(),
                 pcroom.getNameOfPcroom(),
+                pcroom.getSeatCount(),
                 pcroom.getPort(),
                 pcroom.getWidth(),
                 pcroom.getHeight()
         );
     }
 
-    // 자리 저장
+    /**
+     * 피시방 자리 저장
+     * @param seatsDtos
+     * @return
+     */
     @Transactional
-    public List<SeatsDto> registerNewSeat(SeatsDto seatsDto) {
-
-        String name = seatsDto.getNameOfPcroom();
-        Optional<Pcroom> pcroomOpt = pcroomRepository.findByNameOfPcroom(name);
-        if (pcroomOpt.isPresent()) {
-            Long pcroomId = pcroomOpt.get().getPcroomId();
+    public List<SeatsDto> registerNewSeat(List<SeatsDto> seatsDtos) {
+        String nameOfPcroom = seatsDtos.getFirst().getNameOfPcroom();
+        Pcroom pcroom = pcroomRepository.findByNameOfPcroom(nameOfPcroom)
+                .orElseThrow(() -> new IllegalArgumentException("해당 피시방 없음: " + nameOfPcroom));
+        int seatNum = pcroom.getSeatCount();
+        if(seatsDtos.size() != seatNum) {
+            throw new IllegalArgumentException(nameOfPcroom + "피시방은 좌석을 " + seatNum + "개만 입력이 가능합니다.");
         }
 
-        var seat = Seat.register(
-                Long.valueOf(seatsDto.getSeatsNum()),
-                seatsDto.getSeatsNum(),
-                seatsDto.getSeatsIp(),
-                seatsDto.getX(),
-                seatsDto.getY()
-        );
-        seatRepository.save(seat);
+        List<Seat> seats = seatsDtos.stream()
+                .map(dto -> dto.toEntity(pcroom))
+                .toList();
 
+        seatRepository.saveAll(seats);
         return null;
     }
 }

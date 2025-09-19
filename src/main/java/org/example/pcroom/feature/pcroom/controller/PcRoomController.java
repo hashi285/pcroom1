@@ -7,6 +7,7 @@ import org.example.pcroom.feature.pcroom.dto.PingUtilizationDto;
 import org.example.pcroom.feature.pcroom.dto.SeatsDto;
 import org.example.pcroom.feature.pcroom.service.PcRoomService;
 import org.example.pcroom.feature.pcroom.service.PingService;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
@@ -17,21 +18,23 @@ public class PcRoomController {
     private final PcRoomService pcRoomService;
     private final PingService pingService;
 
-
+    /** 완료
+     *
+     * @param pcroomId
+     * @return
+     * @throws Exception
+     */
     @PostMapping("/Utilization")
     @Operation(summary = "피시방 가동률 확인", description = "피시방 가동률 반환")
     public PingUtilizationDto getSeats(@RequestBody Long pcroomId) throws Exception {
         return pcRoomService.canUseSeat(pcroomId);
     }
 
-//    @GetMapping("/pc/{pcroomid}/{is_available}")
-//    @Operation(summary = "피시방 다인 이용 자리 추천", description = "사용 가능 자리 Map 형식으로 반환")
-//    public Map<Integer, List<Integer>> getPcRoomSeats(@PathVariable Long pcroomid, Long is_available) throws Exception {
-//        return pcRoomService.getIpResult(pcroomid,is_available);
-//    }
-
-    // GET | http://수혁군서버.com/api/pcrooms/1 -> pc 상세조회
-    // POST |http://수혁군서버.com/api/pcrooms/ -> pc 새로등록
+    /**
+     * 피시방 저장
+     * @param request
+     * @return
+     */
     @PostMapping("/set_pcroom")
     @Operation(summary = "피시방 저장")
     public PcroomDto.ReadPcRoomResponse setPcroom(@RequestBody PcroomDto.CreatePcRoomRequest request) {
@@ -39,10 +42,11 @@ public class PcRoomController {
         return pcRoomService.registerNewPcroom(request);
     }
 
-    @PostMapping
-    @Operation(summary = "자리 저장")
-    public List<SeatsDto> setSeats(@RequestBody SeatsDto seatsDto) {
+    @PostMapping("/seats")
+    @Operation(summary = "피시방 좌석 저장")
+    public ResponseEntity<List<SeatsDto>> registerSeats(@RequestBody List<SeatsDto> seatsDtos) {
 
-        return pcRoomService.registerNewSeat(seatsDto);
+        List<SeatsDto> savedSeats = pcRoomService.registerNewSeat(seatsDtos);
+        return ResponseEntity.ok(savedSeats);
     }
 }
