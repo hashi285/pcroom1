@@ -1,4 +1,4 @@
-package org.example.pcroom.feature.pcroom.entity;
+package org.example.pcroom.feature.user.entity;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -14,7 +14,7 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class PcroomUser {
+public class Favorite {
     @Id
     @GeneratedValue
     private Long id;
@@ -24,4 +24,9 @@ public class PcroomUser {
 
     @Column(nullable = false)
     private Long pcroomId;
+
+    public Favorite(Long userId, Long pcroomId) {
+        this.userId = userId;
+        this.pcroomId = pcroomId;
+    }
 }

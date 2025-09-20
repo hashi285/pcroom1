@@ -10,7 +10,6 @@ import org.example.pcroom.feature.pcroom.service.PingService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
-import java.util.concurrent.ExecutionException;
 
 @RequestMapping("pc")
 @RestController
@@ -25,9 +24,9 @@ public class PcRoomController {
      * @return
      * @throws Exception
      */
-    @PostMapping("/Utilization")
+    @PostMapping("/utilization/{pcroomId}")
     @Operation(summary = "피시방 가동률 확인", description = "피시방 가동률 반환")
-    public PingUtilizationDto getSeats(@RequestBody Long pcroomId) throws Exception {
+    public PingUtilizationDto getSeats(@PathVariable Long pcroomId) throws Exception {
         return pcRoomService.canUseSeat(pcroomId);
     }
 
@@ -66,5 +65,13 @@ public class PcRoomController {
     public ResponseEntity<List<PcroomDto>> searchPcrooms(@RequestParam String name){
         List<PcroomDto> result = pcRoomService.searchPcrooms(name);
         return ResponseEntity.ok(result);
+    }
+
+
+    // 피시방 자리 추천 알고리즘
+    @PostMapping("/recommendation")
+    @Operation(summary = "자리 추천", description = "사용 가능한 자리를 추천한다.")
+    public void recommendation (@RequestBody Integer partySize){
+
     }
 }
