@@ -100,4 +100,10 @@ public class PcRoomService {
                 .map(PcroomDto::fromEntity)
                 .toList();
     }
+
+    @Transactional
+    public List recommendation(Integer partySize){
+
+        return null;
+    }
 }
