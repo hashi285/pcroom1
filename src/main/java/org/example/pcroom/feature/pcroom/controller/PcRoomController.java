@@ -16,7 +16,6 @@ import java.util.List;
 @RequiredArgsConstructor
 public class PcRoomController {
     private final PcRoomService pcRoomService;
-    private final PingService pingService;
 
     /** 완료
      *
