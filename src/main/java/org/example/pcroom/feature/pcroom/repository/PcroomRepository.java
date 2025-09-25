@@ -24,6 +24,9 @@ public interface PcroomRepository extends JpaRepository<Pcroom, Long> {
 
     List<Pcroom> findByNameOfPcroomIn(List<String> nameOfPcroom);
 
+    List<Pcroom> findAllByOrderByNameOfPcroom();
+
+
 }
 
 

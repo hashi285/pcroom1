@@ -5,7 +5,10 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
+import org.example.pcroom.feature.admin.dto.PcroomListDto;
 import org.example.pcroom.feature.admin.dto.UserListDto;
+import org.example.pcroom.feature.pcroom.entity.Pcroom;
+import org.example.pcroom.feature.pcroom.repository.PcroomRepository;
 import org.example.pcroom.feature.user.repository.UserRepository;
 import org.springframework.stereotype.Service;
 import java.util.List;
@@ -14,6 +17,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class AdminService {
     private final UserRepository userRepository;
+    private final PcroomRepository pcroomRepository;
 
     @Transactional
     public List<UserListDto> getAllUsers() {
@@ -27,6 +31,14 @@ public class AdminService {
                         user.getCreateDate()
 
                 ))
+                .toList();
+    }
+
+    @Transactional
+    public List<PcroomListDto> getAllPcroom() {
+        List<Pcroom> pcroomList = pcroomRepository.findAllByOrderByNameOfPcroom();
+        return pcroomList.stream()
+                .map(pc -> new PcroomListDto(pc.getPcroomId(), pc.getNameOfPcroom(), pc.getSeatCount()))
                 .toList();
     }
 }
