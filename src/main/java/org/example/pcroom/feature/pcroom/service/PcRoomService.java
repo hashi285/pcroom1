@@ -2,6 +2,7 @@ package org.example.pcroom.feature.pcroom.service;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import lombok.SneakyThrows;
 import org.example.pcroom.feature.pcroom.dto.PcroomDto;
 import org.example.pcroom.feature.pcroom.dto.PingUtilizationDto;
 import org.example.pcroom.feature.pcroom.dto.SeatsDto;
@@ -9,8 +10,12 @@ import org.example.pcroom.feature.pcroom.entity.Pcroom;
 import org.example.pcroom.feature.pcroom.entity.Seat;
 import org.example.pcroom.feature.pcroom.repository.PcroomRepository;
 import org.example.pcroom.feature.pcroom.repository.SeatRepository;
+import org.example.pcroom.feature.user.service.UserService;
 import org.springframework.stereotype.Service;
 import java.util.*;
+import java.util.concurrent.ExecutionException;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -18,6 +23,7 @@ public class PcRoomService {
     private final PingService pingService;
     private final PcroomRepository pcroomRepository;
     private final SeatRepository seatRepository;
+    private final UserService userService;
 
 
     /**
@@ -101,9 +107,81 @@ public class PcRoomService {
                 .toList();
     }
 
+    /**
+     * 피시방 자리추천 알고리즘
+     * @param partySize
+     * @return
+     */
+    @SneakyThrows
     @Transactional
-    public List recommendation(Integer partySize){
+    public List<Pcroom> recommendation(Integer partySize, Long userId) throws ExecutionException {
+        List<String> favorite = userService.isFavorite(userId);
+        List<Pcroom> pcroom1 = pcroomRepository.findByNameOfPcroomIn(favorite);
+        List<Long> id = pcroom1.stream()
+                        .map(Pcroom::getPcroomId)
+                                .toList();
 
-        return null;
+        for (int i = 0; i < id.size(); i++){
+
+            Long ia = id.get(i);
+            System.out.println(ia);
+            pingService.ping(ia);
+        }
+
+        List<Pcroom> result = pcroom1.stream()
+                .filter(pcroom -> hasContinuousSeats(pcroom.getPcroomId(), partySize))
+                .toList();
+
+        return result;
+    }
+
+    // 특정 피시방에 partySize 만큼 연속된 자리 있는지 체크
+    private boolean hasContinuousSeats(Long pcroomId, int partySize) {
+        // 사용 가능한 좌석 조회
+        List<Seat> availableSeats = seatRepository.findAvailableSeatsByPcroomId(pcroomId);
+
+        // 좌표 기반 BFS/DFS 탐색으로 그룹화
+        List<List<Seat>> groups = findAdjacentGroups(availableSeats);
+
+        // 그룹 중 partySize 이상인 그룹이 있으면 true
+        return groups.stream().anyMatch(group -> group.size() >= partySize);
+    }
+
+    // BFS/DFS 로 붙어있는 자리 그룹 찾기
+    private List<List<Seat>> findAdjacentGroups(List<Seat> seats) {
+        Map<String, Seat> seatMap = seats.stream()
+                .collect(Collectors.toMap(s -> s.getX() + "," + s.getY(), Function.identity()));
+
+        Set<String> visited = new HashSet<>();
+        List<List<Seat>> groups = new ArrayList<>();
+        int[][] directions = {{1,0},{-1,0},{0,1},{0,-1}}; // 상하좌우
+
+        for (Seat seat : seats) {
+            String key = seat.getX() + "," + seat.getY();
+            if (visited.contains(key)) continue;
+
+            List<Seat> group = new ArrayList<>();
+            Queue<Seat> queue = new LinkedList<>();
+            queue.add(seat);
+
+            while (!queue.isEmpty()) {
+                Seat cur = queue.poll();
+                String curKey = cur.getX() + "," + cur.getY();
+                if (visited.contains(curKey)) continue;
+                visited.add(curKey);
+                group.add(cur);
+
+                for (int[] dir : directions) {
+                    String neighborKey = (cur.getX() + dir[0]) + "," + (cur.getY() + dir[1]);
+                    if (seatMap.containsKey(neighborKey) && !visited.contains(neighborKey)) {
+                        queue.add(seatMap.get(neighborKey));
+                    }
+                }
+            }
+
+            groups.add(group);
+        }
+
+        return groups;
     }
 }

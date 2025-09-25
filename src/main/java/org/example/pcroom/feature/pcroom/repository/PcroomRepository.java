@@ -22,6 +22,8 @@ public interface PcroomRepository extends JpaRepository<Pcroom, Long> {
     @Query("SELECT p FROM Pcroom p WHERE p.nameOfPcroom LIKE %:name%")
     List<Pcroom> searchByNameLike(@Param("name") String name);
 
+    List<Pcroom> findByNameOfPcroomIn(List<String> nameOfPcroom);
+
 }
 
 
