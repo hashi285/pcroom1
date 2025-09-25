@@ -5,11 +5,15 @@ import lombok.RequiredArgsConstructor;
 import org.example.pcroom.feature.pcroom.dto.PcroomDto;
 import org.example.pcroom.feature.pcroom.dto.PingUtilizationDto;
 import org.example.pcroom.feature.pcroom.dto.SeatsDto;
+import org.example.pcroom.feature.pcroom.entity.Pcroom;
 import org.example.pcroom.feature.pcroom.service.PcRoomService;
 import org.example.pcroom.feature.pcroom.service.PingService;
+import org.example.pcroom.global.config.security.CustomUserDetails;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 
 @RequestMapping("pc")
 @RestController
@@ -70,7 +74,17 @@ public class PcRoomController {
     // 피시방 자리 추천 알고리즘
     @PostMapping("/recommendation")
     @Operation(summary = "자리 추천", description = "사용 가능한 자리를 추천한다.")
-    public void recommendation (@RequestBody Integer partySize){
+    public List<Pcroom> recommendation (Authentication authentication,
+                                        @RequestBody Integer partySize){
 
+        // CustomUserDetails로 캐스팅
+        CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+        Long userId = userDetails.getUserId();
+
+        try {
+            return pcRoomService.recommendation(partySize,userId);
+        } catch (ExecutionException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

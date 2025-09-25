@@ -2,6 +2,7 @@ package org.example.pcroom.feature.user.service;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.example.pcroom.feature.pcroom.entity.Pcroom;
 import org.example.pcroom.feature.pcroom.repository.PcroomRepository;
 import org.example.pcroom.feature.user.dto.SignupRequest;
 import org.example.pcroom.feature.user.dto.SignupResponse;
@@ -75,5 +76,10 @@ public class UserService {
     @Transactional
     public List<String> isFavorite(Long userId) {
         return favoriteRepository.findFavoritePcroomNamesByUserId(userId);
+    }
+
+    @Transactional
+    public List<Pcroom> isFavoritePcroom(Long userId) {
+        return null;
     }
 }

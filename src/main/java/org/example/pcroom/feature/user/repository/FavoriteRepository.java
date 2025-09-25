@@ -26,4 +26,6 @@ public interface FavoriteRepository extends JpaRepository<Favorite, Long> {
             "FROM Pcroom p JOIN Favorite f ON f.pcroomId = p.pcroomId " +
             "WHERE f.userId = :userId")
     List<String> findFavoritePcroomNamesByUserId(@Param("userId") Long userId);
+
+
 }

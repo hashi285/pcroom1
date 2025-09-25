@@ -100,5 +100,4 @@ public class UserController {
         List<String> favorites = userService.isFavorite(userId);
         return ResponseEntity.ok(favorites);
     }
-
 }
