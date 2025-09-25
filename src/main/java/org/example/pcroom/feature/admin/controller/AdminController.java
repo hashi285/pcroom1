@@ -18,7 +18,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/admin")
 @RequiredArgsConstructor
-@Tag(name = "관리자 API", description = "관리자")
+@Tag(name = "관리자 API", description = "앱 관리자만 사용합니다.")
 public class AdminController {
     private final AdminService adminService;
 

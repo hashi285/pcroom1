@@ -1,6 +1,7 @@
 package org.example.pcroom.feature.user.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.example.pcroom.feature.user.dto.LoginRequest;
 import org.example.pcroom.feature.user.dto.SignupRequest;
@@ -20,6 +21,8 @@ import java.util.Map;
 @RestController
 @RequestMapping("/auth")
 @RequiredArgsConstructor
+@Tag(name = "일반유저 + 관리자 + 피시방 매니저 API", description = "모든 회원이 사용합니다.")
+
 public class UserController {
 
     private final UserService userService;

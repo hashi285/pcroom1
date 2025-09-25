@@ -1,6 +1,7 @@
 package org.example.pcroom.feature.pcroom.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.example.pcroom.feature.pcroom.dto.PcroomDto;
 import org.example.pcroom.feature.pcroom.dto.PingUtilizationDto;
@@ -18,6 +19,8 @@ import java.util.concurrent.ExecutionException;
 @RequestMapping("pc")
 @RestController
 @RequiredArgsConstructor
+@Tag(name = "앱 주요 기능 API", description = "이 앱의 주요 기능이 모여있는 API 입니다. 모든 회원이 사용합니다.")
+
 public class PcRoomController {
     private final PcRoomService pcRoomService;
 
