@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
-@RequestMapping("pc")
+@RequestMapping("pcrooms")
 @RestController
 @RequiredArgsConstructor
 @Tag(name = "앱 주요 기능 API", description = "이 앱의 주요 기능이 모여있는 API 입니다. 모든 회원이 사용합니다.")
@@ -30,45 +30,21 @@ public class PcRoomController {
      * @return
      * @throws Exception
      */
-    @PostMapping("/utilization/{pcroomId}")
+    @GetMapping("/{pcroomId}/utilization")
     @Operation(summary = "피시방 가동률 확인", description = "피시방 가동률 반환")
     public PingUtilizationDto getSeats(@PathVariable Long pcroomId) throws Exception {
         return pcRoomService.canUseSeat(pcroomId);
     }
 
-    /**
-     * 피시방 저장
-     * @param request
-     * @return
-     */
-    @PostMapping("/set_pcroom")
-    @Operation(summary = "피시방 저장")
-    public PcroomDto.ReadPcRoomResponse setPcroom(@RequestBody PcroomDto.CreatePcRoomRequest request) {
-
-        return pcRoomService.registerNewPcroom(request);
-    }
-
-    /**
-     * 피시방 좌석 저장
-     * @param seatsDtos
-     * @return
-     */
-    @PostMapping("/seats")
-    @Operation(summary = "피시방 좌석 저장")
-    public ResponseEntity<List<SeatsDto>> registerSeats(@RequestBody List<SeatsDto> seatsDtos) {
-
-        List<SeatsDto> savedSeats = pcRoomService.registerNewSeat(seatsDtos);
-        return ResponseEntity.ok(savedSeats);
-    }
 
     /**
      * 피시방 검색
      * @param name
      * @return
      */
-    @GetMapping("/search")
+    @GetMapping
     @Operation(summary = "피시방 LIKE 검색", description = "검색 단어가 들어간 피시방을 반환한다.")
-    public ResponseEntity<List<PcroomDto>> searchPcrooms(@RequestParam String name){
+    public ResponseEntity<List<PcroomDto>> searchPcrooms(@RequestParam(required = false) String name){
         List<PcroomDto> result = pcRoomService.searchPcrooms(name);
         return ResponseEntity.ok(result);
     }

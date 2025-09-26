@@ -1,8 +1,6 @@
 package org.example.pcroom.feature.admin.service;
 
 import jakarta.transaction.Transactional;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import org.example.pcroom.feature.admin.dto.PcroomListDto;
@@ -40,5 +38,14 @@ public class AdminService {
         return pcroomList.stream()
                 .map(pc -> new PcroomListDto(pc.getPcroomId(), pc.getNameOfPcroom(), pc.getSeatCount()))
                 .toList();
+    }
+
+    /**
+     * 피시방 삭제
+     * @param pcroomId 피시방 아이디를 이용하여 삭제
+     */
+    @Transactional
+    public void removePcroom(Long pcroomId) {
+        pcroomRepository.deleteById(pcroomId);
     }
 }
