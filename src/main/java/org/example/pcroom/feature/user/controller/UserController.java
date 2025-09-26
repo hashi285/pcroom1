@@ -15,14 +15,12 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
-import java.util.List;
-import java.util.Map;
 
+import java.util.Map;
 @RestController
 @RequestMapping("/auth")
 @RequiredArgsConstructor
-@Tag(name = "일반유저 + 관리자 + 피시방 매니저 API", description = "모든 회원이 사용합니다.")
-
+@Tag(name = "일반유저 로그인 및 회원가입 API", description = "로그인 및 회원가입 기능입니다.")
 public class UserController {
 
     private final UserService userService;
@@ -42,10 +40,8 @@ public class UserController {
             Authentication auth = authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword())
             );
-
-            // 로그인 성공 후 UserDetails 에서 userId 추출
             CustomUserDetails userDetails = (CustomUserDetails) auth.getPrincipal();
-            Long userId = userDetails.getUserId(); // DB에서 가져온 ID
+            Long userId = userDetails.getUserId();
 
             String jwt = jwtUtil.generateToken(userId, userDetails.getUsername());
             return ResponseEntity.ok(Map.of("token", jwt));
@@ -53,54 +49,5 @@ public class UserController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("로그인 실패: " + e.getMessage());
         }
     }
-
-    /**
-     * 즐겨찾기 추가
-     */
-    @PostMapping("/{pcroomId}")
-    @Operation(summary = "즐겨찾기 추가")
-    public ResponseEntity<Void> addFavorite(
-            Authentication authentication, // Authentication 객체 직접 받기
-            @PathVariable Long pcroomId) {
-
-        // CustomUserDetails로 캐스팅
-        CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
-        Long userId = userDetails.getUserId();
-
-        userService.addFavorite(userId, pcroomId);
-        return ResponseEntity.ok().build();
-    }
-
-
-    /**
-     * 즐겨찾기 삭제
-     */
-    @DeleteMapping("/{pcroomId}")
-    @Operation(summary = "즐겨찾기 삭제")
-    public ResponseEntity<Void> removeFavorite(
-            Authentication authentication,
-            @PathVariable Long pcroomId) {
-        // CustomUserDetails로 캐스팅
-        CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
-        Long userId = userDetails.getUserId();
-
-        System.out.println("--------------------------------------------"+ pcroomId);
-        userService.removeFavorite(userId, pcroomId);
-        return ResponseEntity.noContent().build();
-    }
-
-    /**
-     * 즐겨찾기한 PC방 이름 목록 조회
-     */
-    @GetMapping
-    @Operation(summary = "즐겨찾기한 PC방 이름 목록 조회")
-    public ResponseEntity<List<String>> getFavoritePcrooms(
-            Authentication authentication) {
-        // CustomUserDetails로 캐스팅
-        CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
-        Long userId = userDetails.getUserId();
-
-        List<String> favorites = userService.isFavorite(userId);
-        return ResponseEntity.ok(favorites);
-    }
 }
+
