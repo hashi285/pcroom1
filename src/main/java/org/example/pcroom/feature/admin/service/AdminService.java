@@ -2,7 +2,6 @@ package org.example.pcroom.feature.admin.service;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import lombok.Setter;
 import org.example.pcroom.feature.admin.dto.PcroomListDto;
 import org.example.pcroom.feature.admin.dto.UserListDto;
 import org.example.pcroom.feature.pcroom.entity.Pcroom;
