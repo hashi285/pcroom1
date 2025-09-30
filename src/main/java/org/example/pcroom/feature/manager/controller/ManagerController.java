@@ -48,12 +48,13 @@ public class ManagerController {
         return ResponseEntity.ok(savedSeats);
     }
 
-    @PostMapping("/{pcroomId}/managers")
-    public ResponseEntity<ManagerPcroomDto.addPcroomResponse> assignManager(Authentication authentication, @PathVariable Long pcroomId) {
+    @GetMapping("/utilization")
+    @Operation(summary = "경쟁 피시방 가동률 확인 ", description = "경쟁 피시방의 가동률을 반환합니다.")
+    public ResponseEntity<List<ManagerPcroomDto.FindByManagerId>> getManagerPcrooms(Authentication authentication) {
+        // CustomUserDetails로 캐스팅
         CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+        Long userId = userDetails.getUserId();
 
-            ManagerPcroomDto.addPcroomResponse response = managerService.assignManagerToPcroom(userDetails.getUserId(), pcroomId);
-
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(managerService.findByManagerId(userId));
     }
 }

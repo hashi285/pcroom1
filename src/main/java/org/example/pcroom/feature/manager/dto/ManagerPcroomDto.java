@@ -4,6 +4,8 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.time.LocalDateTime;
+
 @Getter
 @Setter
 @AllArgsConstructor
@@ -27,13 +29,18 @@ public class ManagerPcroomDto {
 
     @Getter
     @AllArgsConstructor
-    public static class findByManagerId{
-        private Long userId;
-
+    public static class FindByManagerId{
         private Long pcroomId;
 
         private String nameOfPcroom;
 
+        private double utilization;
+
+        private LocalDateTime time;
 
     }
+
+    @Getter
+    @AllArgsConstructor
+    public static class findByManagerIdAndPcroomId{}
 }
