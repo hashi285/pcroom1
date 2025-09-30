@@ -19,7 +19,7 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
-public class PcRoomService {
+public class PcroomService {
     private final PingService pingService;
     private final PcroomRepository pcroomRepository;
     private final SeatRepository seatRepository;
@@ -112,28 +112,28 @@ public class PcRoomService {
      * @param partySize
      * @return
      */
-    @SneakyThrows
-    @Transactional
-    public List<Pcroom> recommendation(Integer partySize, Long userId) throws ExecutionException {
-        List<String> favorite = userService.isFavorite(userId);
-        List<Pcroom> pcroom1 = pcroomRepository.findByNameOfPcroomIn(favorite);
-        List<Long> id = pcroom1.stream()
-                        .map(Pcroom::getPcroomId)
-                                .toList();
-
-        for (int i = 0; i < id.size(); i++){
-
-            Long ia = id.get(i);
-            System.out.println(ia);
-            pingService.ping(ia);
-        }
-
-        List<Pcroom> result = pcroom1.stream()
-                .filter(pcroom -> hasContinuousSeats(pcroom.getPcroomId(), partySize))
-                .toList();
-
-        return result;
-    }
+//    @SneakyThrows
+//    @Transactional
+//    public List<Pcroom> recommendation(Integer partySize, Long userId) throws ExecutionException {
+//        List<String> favorite = userService.isFavorite(userId);
+//        List<Pcroom> pcroom1 = pcroomRepository.findByNameOfPcroomIn(favorite);
+//        List<Long> id = pcroom1.stream()
+//                        .map(Pcroom::getPcroomId)
+//                                .toList();
+//
+//        for (int i = 0; i < id.size(); i++){
+//
+//            Long ia = id.get(i);
+//            System.out.println(ia);
+//            pingService.ping(ia);
+//        }
+//
+//        List<Pcroom> result = pcroom1.stream()
+//                .filter(pcroom -> hasContinuousSeats(pcroom.getPcroomId(), partySize))
+//                .toList();
+//
+//        return result;
+//    }
 
     // 특정 피시방에 partySize 만큼 연속된 자리 있는지 체크
     private boolean hasContinuousSeats(Long pcroomId, int partySize) {

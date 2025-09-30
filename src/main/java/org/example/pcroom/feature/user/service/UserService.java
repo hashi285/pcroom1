@@ -4,6 +4,7 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.example.pcroom.feature.pcroom.entity.Pcroom;
 import org.example.pcroom.feature.pcroom.repository.PcroomRepository;
+import org.example.pcroom.feature.user.dto.FavoriteDto;
 import org.example.pcroom.feature.user.dto.SignupRequest;
 import org.example.pcroom.feature.user.dto.SignupResponse;
 import org.example.pcroom.feature.user.entity.Favorite;
@@ -74,12 +75,7 @@ public class UserService {
      * @return
      */
     @Transactional
-    public List<String> isFavorite(Long userId) {
-        return favoriteRepository.findFavoritePcroomNamesByUserId(userId);
-    }
-
-    @Transactional
-    public List<Pcroom> isFavoritePcroom(Long userId) {
-        return null;
+    public List<FavoriteDto> isFavorite(Long userId) {
+        return favoriteRepository.findFavoritePcroomsByUserId(userId);
     }
 }

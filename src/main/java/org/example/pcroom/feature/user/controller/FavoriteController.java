@@ -3,6 +3,7 @@ package org.example.pcroom.feature.user.controller;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.example.pcroom.feature.user.dto.FavoriteDto;
 import org.example.pcroom.feature.user.service.UserService;
 import org.example.pcroom.global.config.security.CustomUserDetails;
 import org.springframework.http.ResponseEntity;
@@ -37,9 +38,9 @@ public class FavoriteController {
 
     @GetMapping
     @Operation(summary = "즐겨찾기 목록 조회")
-    public ResponseEntity<List<String>> getFavoritePcrooms(Authentication authentication) {
+    public ResponseEntity<List<FavoriteDto>> getFavoritePcrooms(Authentication authentication) {
         CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
-        List<String> favorites = userService.isFavorite(userDetails.getUserId());
+        List<FavoriteDto> favorites = userService.isFavorite(userDetails.getUserId());
         return ResponseEntity.ok(favorites);
     }
 }
