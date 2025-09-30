@@ -6,7 +6,7 @@ import lombok.RequiredArgsConstructor;
 import org.example.pcroom.feature.pcroom.dto.PcroomDto;
 import org.example.pcroom.feature.pcroom.dto.PingUtilizationDto;
 import org.example.pcroom.feature.pcroom.entity.Pcroom;
-import org.example.pcroom.feature.pcroom.service.PcRoomService;
+import org.example.pcroom.feature.pcroom.service.PcroomService;
 import org.example.pcroom.global.config.security.CustomUserDetails;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -20,7 +20,7 @@ import java.util.concurrent.ExecutionException;
 @Tag(name = "앱 주요 기능 API", description = "이 앱의 주요 기능이 모여있는 API 입니다. 모든 회원이 사용합니다.")
 
 public class PcRoomController {
-    private final PcRoomService pcRoomService;
+    private final PcroomService pcRoomService;
 
     /** 완료
      *
@@ -49,19 +49,19 @@ public class PcRoomController {
 
 
     // 피시방 자리 추천 알고리즘
-    @PostMapping("/recommendation")
-    @Operation(summary = "자리 추천", description = "사용 가능한 자리를 추천한다.")
-    public List<Pcroom> recommendation (Authentication authentication,
-                                        @RequestBody Integer partySize){
-
-        // CustomUserDetails로 캐스팅
-        CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
-        Long userId = userDetails.getUserId();
-
-        try {
-            return pcRoomService.recommendation(partySize,userId);
-        } catch (ExecutionException e) {
-            throw new RuntimeException(e);
-        }
-    }
+//    @PostMapping("/recommendation")
+//    @Operation(summary = "자리 추천", description = "사용 가능한 자리를 추천한다.")
+//    public List<Pcroom> recommendation (Authentication authentication,
+//                                        @RequestBody Integer partySize){
+//
+//        // CustomUserDetails로 캐스팅
+//        CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+//        Long userId = userDetails.getUserId();
+//
+//        try {
+//            return pcRoomService.recommendation(partySize,userId);
+//        } catch (ExecutionException e) {
+//            throw new RuntimeException(e);
+//        }
+//    }
 }

@@ -8,11 +8,6 @@ import lombok.Setter;
 @Setter
 @Getter
 public class FavoriteDto {
-
-    @Getter
-    @AllArgsConstructor
-    public static class FavoriteResponse {
-        private Long pcroomId;
-        private String nameOfPcroom;
-    }
+    private Long pcroomId;
+    private String nameOfPcroom;
 }

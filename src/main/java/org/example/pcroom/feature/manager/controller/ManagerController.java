@@ -7,7 +7,7 @@ import org.example.pcroom.feature.manager.dto.ManagerPcroomDto;
 import org.example.pcroom.feature.manager.service.ManagerService;
 import org.example.pcroom.feature.pcroom.dto.PcroomDto;
 import org.example.pcroom.feature.pcroom.dto.SeatsDto;
-import org.example.pcroom.feature.pcroom.service.PcRoomService;
+import org.example.pcroom.feature.pcroom.service.PcroomService;
 import org.example.pcroom.global.config.security.CustomUserDetails;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -21,7 +21,7 @@ import java.util.List;
 @Tag(name = "관리자 + 피시방 매니저 API", description = "앱 관리자 및 피시방 매니저만 사용합니다.")
 public class ManagerController {
 
-    private final PcRoomService pcRoomService;
+    private final PcroomService pcRoomService;
     private final ManagerService managerService;
     /**
      * 피시방 저장

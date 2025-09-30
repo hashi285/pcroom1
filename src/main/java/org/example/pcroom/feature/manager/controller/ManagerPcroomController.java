@@ -5,7 +5,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.example.pcroom.feature.manager.dto.ManagerPcroomDto;
 import org.example.pcroom.feature.manager.service.ManagerService;
-import org.example.pcroom.feature.pcroom.service.PcRoomService;
+import org.example.pcroom.feature.pcroom.service.PcroomService;
 import org.example.pcroom.global.config.security.CustomUserDetails;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.*;
 @Tag(name = "매니저-피시방 매핑 API", description = "피시방 매니저가 경쟁 피시방을 등록/삭제합니다.")
 public class ManagerPcroomController {
 
-    private final PcRoomService pcRoomService;
+    private final PcroomService pcRoomService;
     private final ManagerService managerService;
 
     @PostMapping("/{pcroomId}/managers")
