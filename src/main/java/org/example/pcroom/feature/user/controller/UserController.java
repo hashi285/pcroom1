@@ -17,6 +17,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
+
 @RestController
 @RequestMapping("/auth")
 @RequiredArgsConstructor
@@ -27,19 +28,19 @@ public class UserController {
     private final AuthenticationManager authenticationManager;
     private final JwtUtil jwtUtil;
 
+    // 회원가입 기능
     @PostMapping("/signup")
-    @Operation(summary = "회원가입")
+    @Operation(summary = "회원가입", description = "이메일, 비밀번호, 닉네임을 받아 회원가입을 처리합니다.")
     public ResponseEntity<SignupResponse> signup(@RequestBody SignupRequest request) {
         return ResponseEntity.ok(userService.signup(request));
     }
 
+    // 로그인 기능
     @PostMapping("/login")
-    @Operation(summary = "로그인")
+    @Operation(summary = "로그인", description = "이메일, 비밀번호를 받아 로그인을 처리합니다.")
     public ResponseEntity<?> login(@RequestBody LoginRequest request) {
         try {
-            Authentication auth = authenticationManager.authenticate(
-                    new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword())
-            );
+            Authentication auth = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword()));
             CustomUserDetails userDetails = (CustomUserDetails) auth.getPrincipal();
             Long userId = userDetails.getUserId();
 
@@ -50,4 +51,7 @@ public class UserController {
         }
     }
 }
+
+
+
 
