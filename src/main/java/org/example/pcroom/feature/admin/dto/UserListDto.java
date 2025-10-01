@@ -3,7 +3,7 @@ package org.example.pcroom.feature.admin.dto;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
-import org.example.pcroom.feature.pcroom.enums.UserRole;
+import org.example.pcroom.feature.user.enums.UserRole;
 import java.time.LocalDateTime;
 
 @Getter
