@@ -20,7 +20,7 @@ public class Favorite {
     private Long id;
 
     @Column(nullable = false)
-    private  Long userId;
+    private Long userId;
 
     @Column(nullable = false)
     private Long pcroomId;

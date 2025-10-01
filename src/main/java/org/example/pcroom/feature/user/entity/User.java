@@ -5,11 +5,12 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.example.pcroom.feature.pcroom.enums.UserRole;
+
 import java.time.LocalDateTime;
 
 /**
  * 유저 정보
-
+ * <p>
  * 주요 필드:
  * - userId: PK, 자동 생성
  * - email: 이메일
@@ -32,7 +33,7 @@ public class User {
     @Column(nullable = false, length = 50, unique = true)
     private String email;
 
-    @Column( length = 15)
+    @Column(length = 15)
     private String nickname;
 
     @Column(nullable = false)
@@ -42,7 +43,7 @@ public class User {
     private LocalDateTime createDate;
 
     @Enumerated(EnumType.STRING)
-    @Column( length = 20)
+    @Column(length = 20)
     private UserRole role;
 
     @PrePersist
