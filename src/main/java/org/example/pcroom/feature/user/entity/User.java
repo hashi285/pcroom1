@@ -4,7 +4,7 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.example.pcroom.feature.pcroom.enums.UserRole;
+import org.example.pcroom.feature.user.enums.UserRole;
 
 import java.time.LocalDateTime;
 

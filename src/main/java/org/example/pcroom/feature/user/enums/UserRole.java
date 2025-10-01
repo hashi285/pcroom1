@@ -1,4 +1,4 @@
-package org.example.pcroom.feature.pcroom.enums;
+package org.example.pcroom.feature.user.enums;
 
 /**
  * - USER: 일반 사용자

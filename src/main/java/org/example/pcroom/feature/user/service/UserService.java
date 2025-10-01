@@ -2,9 +2,7 @@ package org.example.pcroom.feature.user.service;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import org.example.pcroom.feature.pcroom.entity.Pcroom;
-import org.example.pcroom.feature.pcroom.enums.UserRole;
-import org.example.pcroom.feature.pcroom.repository.PcroomRepository;
+import org.example.pcroom.feature.user.enums.UserRole;
 import org.example.pcroom.feature.user.dto.FavoriteDto;
 import org.example.pcroom.feature.user.dto.SignupRequest;
 import org.example.pcroom.feature.user.dto.SignupResponse;
