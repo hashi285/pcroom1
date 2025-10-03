@@ -13,7 +13,7 @@ import org.hibernate.id.IncrementGenerator;
 public class PcroomDto {
 
     private String nameOfPcroom;
-    private int seatCount;
+    private Long pcroomId;
 
     @Getter
     @AllArgsConstructor
@@ -50,6 +50,6 @@ public class PcroomDto {
     public static PcroomDto fromEntity(Pcroom pcroom) {
         return new PcroomDto(
                 pcroom.getNameOfPcroom(),
-                pcroom.getSeatCount()
+                pcroom.getPcroomId()
      ); }
 }
