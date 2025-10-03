@@ -2,6 +2,7 @@ package org.example.pcroom.feature.user.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.example.pcroom.feature.user.dto.LoginRequest;
 import org.example.pcroom.feature.user.dto.SignupRequest;
@@ -19,7 +20,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/auth")
+@RequestMapping
 @RequiredArgsConstructor
 @Tag(name = "일반유저 로그인 및 회원가입 API", description = "로그인 및 회원가입 기능입니다.")
 public class UserController {
@@ -31,7 +32,7 @@ public class UserController {
     // 회원가입 기능
     @PostMapping("/signup")
     @Operation(summary = "회원가입", description = "이메일, 비밀번호, 닉네임을 받아 회원가입을 처리합니다.")
-    public ResponseEntity<SignupResponse> signup(@RequestBody SignupRequest request) {
+    public ResponseEntity<SignupResponse> signup(@Valid @RequestBody SignupRequest request) {
         return ResponseEntity.ok(userService.signup(request));
     }
 
@@ -45,6 +46,7 @@ public class UserController {
             Long userId = userDetails.getUserId();
 
             String jwt = jwtUtil.generateToken(userId, userDetails.getUsername());
+            System.out.println("로그인 성공");
             return ResponseEntity.ok(Map.of("token", jwt));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("로그인 실패: " + e.getMessage());
