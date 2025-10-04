@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import org.example.pcroom.feature.user.dto.LoginRequest;
 import org.example.pcroom.feature.user.dto.SignupRequest;
 import org.example.pcroom.feature.user.dto.SignupResponse;
+import org.example.pcroom.feature.user.enums.UserRole;
 import org.example.pcroom.feature.user.service.UserService;
 import org.example.pcroom.global.config.security.CustomUserDetails;
 import org.example.pcroom.global.config.security.JwtUtil;
@@ -44,8 +45,9 @@ public class UserController {
             Authentication auth = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword()));
             CustomUserDetails userDetails = (CustomUserDetails) auth.getPrincipal();
             Long userId = userDetails.getUserId();
+            UserRole role = userService.userRole(userId);
 
-            String jwt = jwtUtil.generateToken(userId, userDetails.getUsername());
+            String jwt = jwtUtil.generateToken(userId, userDetails.getUsername(), role);
             System.out.println("로그인 성공");
             return ResponseEntity.ok(Map.of("token", jwt));
         } catch (Exception e) {
