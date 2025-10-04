@@ -5,7 +5,7 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import org.example.pcroom.feature.pcroom.entity.Pcroom;
-import org.hibernate.id.IncrementGenerator;
+
 
 @Getter
 @Setter

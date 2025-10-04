@@ -41,6 +41,11 @@ public class UserService {
         return new SignupResponse(user.getEmail(), "회원가입 성공");
     }
 
+    public UserRole userRole(Long userId){
+        User user = userRepository.findById(userId).orElse(null);
+        return user.getRole();
+    }
+
     /**
      * 즐겨찾기 추가
      * @param userId
