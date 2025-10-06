@@ -42,7 +42,7 @@ public class PingService {
         LocalDateTime now = LocalDateTime.now();
 
         // 1분 이상 지난 경우만 Ping 수행
-        if (lastTime.isBefore(now.minusMinutes(1))) {
+        if (lastTime.isBefore(now.minusMinutes(3))) {
             List<Seat> seats = seatRepository.findByPcroomId(pcroomId);
 
             // 좌석 IP 리스트
