@@ -58,7 +58,7 @@ public class ManagerService {
         }
 
         // 가동률 조회
-        List<Utilization> utilizationList = utilizationRepository.findAllByPcroomIdIn(pcroomIdList);
+        List<Utilization> utilizationList = utilizationRepository.findAllByPcroomIdInOrderByTimeDesc(pcroomIdList);
 
         // Utilization -> DTO 변환 (pcroomRepository로 이름 조회)
         return utilizationList.stream()
