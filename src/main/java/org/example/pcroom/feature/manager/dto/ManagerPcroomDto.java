@@ -42,5 +42,18 @@ public class ManagerPcroomDto {
 
     @Getter
     @AllArgsConstructor
-    public static class findByManagerIdAndPcroomId{}
+    public static class FindHourlyUtilization {
+        private Long pcroomId;
+        private String pcroomName;
+        private double utilization;
+        private LocalDateTime recordedAt;
+    }
+
+    @Getter
+    @AllArgsConstructor
+    public static class FindManagerFavorite{
+        private Long userId;
+        private Long pcroomId;
+        private String nameOfPcroom;
+    }
 }

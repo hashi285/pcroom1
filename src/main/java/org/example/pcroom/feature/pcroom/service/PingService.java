@@ -42,7 +42,7 @@ public class PingService {
         LocalDateTime now = LocalDateTime.now();
 
         // 1분 이상 지난 경우만 Ping 수행
-        if (lastTime.isBefore(now.minusMinutes(3))) {
+        if (lastTime.isBefore(now.minusMinutes(1))) {
             List<Seat> seats = seatRepository.findByPcroomId(pcroomId);
 
             // 좌석 IP 리스트
@@ -69,7 +69,7 @@ public class PingService {
                                        Long pcroomId, LocalDateTime now)
             throws InterruptedException, ExecutionException {
 
-        ExecutorService executor = Executors.newFixedThreadPool(Math.min(ipList.size(), 200));
+        ExecutorService executor = Executors.newFixedThreadPool(Math.min(ipList.size(), 50));
         List<Future<IpResult>> futures = new ArrayList<>();
 
         for (String ip : ipList) {
@@ -103,7 +103,7 @@ public class PingService {
      */
     private boolean ping(String ip) {
         try {
-            return InetAddress.getByName(ip).isReachable(1000);
+            return InetAddress.getByName(ip).isReachable(2000);
         } catch (Exception e) {
             return false;
         }
