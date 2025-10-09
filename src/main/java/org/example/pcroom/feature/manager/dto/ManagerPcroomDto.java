@@ -51,8 +51,7 @@ public class ManagerPcroomDto {
 
     @Getter
     @AllArgsConstructor
-    public static class FindManagerFavorite{
-        private Long userId;
+    public static class PcroomManager{
         private Long pcroomId;
         private String nameOfPcroom;
     }
