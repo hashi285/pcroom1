@@ -4,7 +4,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.example.pcroom.feature.manager.dto.ManagerPcroomDto;
-import org.example.pcroom.feature.manager.repository.PcroomManagerRepository;
+import org.example.pcroom.feature.manager.repository.CompetitorRelationRepository;
 import org.example.pcroom.feature.manager.service.ManagerService;
 import org.example.pcroom.feature.pcroom.service.PcroomService;
 import org.example.pcroom.global.config.security.CustomUserDetails;
@@ -22,7 +22,7 @@ public class ManagerPcroomController {
 
     private final PcroomService pcRoomService;
     private final ManagerService managerService;
-    private final PcroomManagerRepository pcroomManagerRepository;
+    private final CompetitorRelationRepository competitorRelationRepository;
 
     @PostMapping("/{pcroomId}")
     @Operation(summary = "경쟁 피시방 등록", description = "가동률을 확인하고 싶은 경쟁 피시방을 등록합니다.")
@@ -50,7 +50,7 @@ public class ManagerPcroomController {
     ) {
         CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
 
-        List<Long> pcroomIds = pcroomManagerRepository.findPcroomIdByUserId(userDetails.getUserId());
+        List<Long> pcroomIds = competitorRelationRepository.findPcroomIdByUserId(userDetails.getUserId());
 
         List<ManagerPcroomDto.FindHourlyUtilization> result = managerService.getHourlyUtilization(pcroomIds, hours);
 
