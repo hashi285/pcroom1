@@ -1,6 +1,7 @@
 package org.example.pcroom.feature.pcroom.scheduler;
 
 import lombok.RequiredArgsConstructor;
+import org.example.pcroom.feature.pcroom.entity.Pcroom;
 import org.example.pcroom.feature.pcroom.repository.PcroomRepository;
 import org.example.pcroom.feature.pcroom.service.PingService;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -18,11 +19,11 @@ public class PingScheduler {
     /**
      * 3분마다 모든 PC방 ping 수행
      */
-    @Scheduled(fixedRate = 3 * 60 * 1000)  // 3분 = 180000ms
+    @Scheduled(cron = "0 0,30 * * * *")
     public void pingAllPcrooms() {
         List<Long> pcroomIds = pcroomRepository.findAll()
                 .stream()
-                .map(pc -> pc.getPcroomId())
+                .map(Pcroom::getPcroomId)
                 .toList();
 
         for (Long pcroomId : pcroomIds) {

@@ -25,6 +25,7 @@ public class PingService {
     private final UtilizationRepository utilizationRepository;
     private final SeatRepository seatRepository;
     private final IpResultRepository ipResultRepository;
+    private final SeatUsageService seatUsageService;
 
     /**
      * 메인 Ping 실행 메서드
@@ -116,6 +117,7 @@ public class PingService {
     protected double saveUtilizationAndResults(List<IpResult> results, Long pcroomId, LocalDateTime now) {
         if (results.isEmpty()) return 0.0;
 
+        // 살아있는 좌석 수 계산
         double aliveCount = results.stream().filter(IpResult::getResult).count();
         double utilizationRate = Math.round((aliveCount / results.size() * 100.0) * 100) / 100.0;
 
@@ -128,10 +130,19 @@ public class PingService {
 
         Long utilizationId = utilization.getUtilizationId();
 
-        // 각 IpResult에 utilizationId 주입 후 개별 save
-        for (IpResult r : results) {
-            r.setUtilizationId(utilizationId);
-            ipResultRepository.save(r);
+        // 30분 단위 체크
+        int minute = now.getMinute();
+        if (minute % 30 == 0) {
+            for (IpResult r : results) {
+                // IpResult에 utilizationId 주입 후 저장
+                r.setUtilizationId(utilizationId);
+                ipResultRepository.save(r);
+
+                // 좌석별 사용시간 누적
+                seatUsageService.updateHourlySeatUsage(
+                        Collections.singletonList(r), pcroomId, now
+                );
+            }
         }
 
         return utilizationRate;
