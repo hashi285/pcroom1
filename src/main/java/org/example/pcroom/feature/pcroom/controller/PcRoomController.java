@@ -5,12 +5,16 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.example.pcroom.feature.pcroom.dto.PcroomDto;
 import org.example.pcroom.feature.pcroom.dto.PingUtilizationDto;
+import org.example.pcroom.feature.pcroom.dto.SeatUsageDailyResponse;
 import org.example.pcroom.feature.pcroom.entity.Pcroom;
 import org.example.pcroom.feature.pcroom.service.PcroomService;
+import org.example.pcroom.feature.pcroom.service.SeatUsageService;
 import org.example.pcroom.global.config.security.CustomUserDetails;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
+
+import java.time.LocalDate;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
@@ -21,6 +25,7 @@ import java.util.concurrent.ExecutionException;
 
 public class PcRoomController {
     private final PcroomService pcRoomService;
+    private final SeatUsageService seatUsageService;
 
     /** 완료
      *
@@ -64,4 +69,16 @@ public class PcRoomController {
 //            throw new RuntimeException(e);
 //        }
 //    }
+
+    @GetMapping("/사용률/{pcroomId}")
+    @Operation(summary = "자리별 사용률을 반환한다.")
+    public ResponseEntity<List<SeatUsageDailyResponse>> getSeatUsage(
+            @PathVariable Long pcroomId,
+            @RequestParam LocalDate start,
+            @RequestParam LocalDate end
+    ) {
+        List<SeatUsageDailyResponse> usageList = seatUsageService.getDailyUsage(pcroomId, start, end);
+        return ResponseEntity.ok(usageList);
+    }
+
 }

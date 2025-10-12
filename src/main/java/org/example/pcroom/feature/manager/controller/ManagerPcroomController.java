@@ -17,10 +17,9 @@ import java.util.List;
 @RestController
 @RequestMapping("manager-favorites")
 @RequiredArgsConstructor
-@Tag(name = "매니저-피시방 매핑 API", description = "피시방 매니저가 경쟁 피시방을 등록/삭제합니다.")
+@Tag(name = "피시방 매니저 API(경쟁 피시방 등록 관련)", description = "피시방 매니저가 경쟁 피시방을 등록/조회/삭제합니다.")
 public class ManagerPcroomController {
 
-    private final PcroomService pcRoomService;
     private final ManagerService managerService;
     private final CompetitorRelationRepository competitorRelationRepository;
 
@@ -34,8 +33,14 @@ public class ManagerPcroomController {
         return ResponseEntity.ok(response);
     }
 
+    @GetMapping("/{pcroomId}/favorite")
+    @Operation(summary = "경쟁 피시방 조회", description = "경쟁 피시방을 조회합니다.")
+    public ResponseEntity<?> showManager (Authentication authentication, @PathVariable Long pcroomId) {
+        return null;
+        }
+
     @DeleteMapping("/{pcroomId}")
-    @Operation(summary = "경쟁 피시방 삭제", description = "등록되어 있던 경쟁 피시방을 삭제합니다.")
+    @Operation(summary = "경쟁 피시방 삭제", description = "경쟁 피시방을 삭제합니다.")
     public ResponseEntity<Void> removeManager (Authentication authentication, @PathVariable Long pcroomId) {
         CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
         managerService.removeManagerFromPcroom(userDetails.getUserId(), pcroomId);
