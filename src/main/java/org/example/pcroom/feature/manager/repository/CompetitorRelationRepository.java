@@ -11,5 +11,6 @@ import java.util.List;
 @Repository
 public interface CompetitorRelationRepository extends JpaRepository<CompetitorRelation, Long> {
     void deletePcroomManagerByUserIdAndPcroomId(Long userId, Long pcroomId);
+
     @Query("SELECT p.pcroomId FROM CompetitorRelation p WHERE p.userId = :userId")
     List<Long> findPcroomIdByUserId(@Param("userId") Long userId);}

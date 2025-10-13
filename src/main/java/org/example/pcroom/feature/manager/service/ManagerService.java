@@ -10,30 +10,21 @@ import org.example.pcroom.feature.manager.repository.PcroomHourlyUtilizationRepo
 import org.example.pcroom.feature.manager.repository.CompetitorRelationRepository;
 import org.example.pcroom.feature.manager.repository.PcroomManagerRepository;
 import org.example.pcroom.feature.pcroom.entity.Pcroom;
-import org.example.pcroom.feature.pcroom.entity.Utilization;
 import org.example.pcroom.feature.pcroom.repository.PcroomRepository;
-import org.example.pcroom.feature.pcroom.repository.UtilizationRepository;
-import org.example.pcroom.feature.pcroom.service.PingService;
-import org.example.pcroom.feature.user.repository.UserRepository;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
-import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 public class ManagerService {
     private final CompetitorRelationRepository competitorRelationRepository;
-    private final PingService pingService;
-    private final UtilizationRepository utilizationRepository;
     private final PcroomRepository pcroomRepository;
     private final PcroomHourlyUtilizationRepository pcroomHourlyUtilizationRepository;
     private final PcroomManagerRepository pcroomManagerRepository;
-    private final UserRepository userRepository;
 
     // 저장
     @Transactional
@@ -63,37 +54,15 @@ public class ManagerService {
 
 
 
-    // 피시방의 가동률을 리스트로 반환
+    // 경쟁 피시방 조회
     @Transactional
-    public List<ManagerPcroomDto.FindByManagerId> findByManagerId(Long userId) {
+    public List<ManagerPcroomDto.PcroomManager> findPcroom(Long userId) {
         List<Long> pcroomIdList = competitorRelationRepository.findPcroomIdByUserId(userId);
 
-        // 최신화
-        for (Long pcroomId : pcroomIdList) {
-            try {
-                pingService.ping(pcroomId);
-            } catch (ExecutionException | InterruptedException e) {
-                throw new RuntimeException(e);
-            }
-        }
-
-        // 가동률 조회
-        List<Utilization> utilizationList = utilizationRepository.findAllByPcroomIdInOrderByTimeDesc(pcroomIdList);
-
-        // Utilization -> DTO 변환 (pcroomRepository로 이름 조회)
-        return utilizationList.stream()
-                .map(util -> {
-                    String pcroomName = pcroomRepository.findById(util.getPcroomId())
-                            .map(Pcroom::getNameOfPcroom)
-                            .orElse("Unknown");
-
-                    return new ManagerPcroomDto.FindByManagerId(
-                            util.getPcroomId(),
-                            pcroomName,
-                            util.getUtilization(),
-                            util.getTime()
-
-                    );
+        return pcroomIdList.stream()
+                .map(pcroomId -> {
+                    String name = pcroomRepository.findNameByPcroomId(pcroomId);
+                    return new ManagerPcroomDto.PcroomManager(pcroomId, name);
                 })
                 .toList();
     }
@@ -117,7 +86,7 @@ public class ManagerService {
                             r.getTime()
                     );
                 })
-                .collect(Collectors.toList());
+                .toList();
     }
 
     // 사용자가 운영중인 피시방을 보여준다.
