@@ -4,6 +4,9 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
+/**
+ * 경쟁 피시방 테이블
+ */
 @Entity
 @Getter
 @Setter

@@ -33,10 +33,14 @@ public class ManagerPcroomController {
         return ResponseEntity.ok(response);
     }
 
-    @GetMapping("/{pcroomId}/favorite")
+    @GetMapping("/favorite")
     @Operation(summary = "경쟁 피시방 조회", description = "경쟁 피시방을 조회합니다.")
-    public ResponseEntity<?> showManager (Authentication authentication, @PathVariable Long pcroomId) {
-        return null;
+    public ResponseEntity<List<ManagerPcroomDto.PcroomManager>> showPcroomList (Authentication authentication) {
+        CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+
+        List <ManagerPcroomDto.PcroomManager> result = managerService.findPcroom(userDetails.getUserId());
+
+        return ResponseEntity.ok(result);
         }
 
     @DeleteMapping("/{pcroomId}")
