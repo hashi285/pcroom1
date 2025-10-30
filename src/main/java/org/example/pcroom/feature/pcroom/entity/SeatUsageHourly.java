@@ -1,9 +1,6 @@
 package org.example.pcroom.feature.pcroom.entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.*;
 import java.time.LocalDateTime;
 
@@ -16,7 +13,7 @@ import java.time.LocalDateTime;
 @Getter
 public class SeatUsageHourly {
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private Long seatId; //좌석 번호
     private Long pcroomId; // 피시방 번호

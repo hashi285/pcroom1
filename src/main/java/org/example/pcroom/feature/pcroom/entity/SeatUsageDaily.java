@@ -1,9 +1,6 @@
 package org.example.pcroom.feature.pcroom.entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -20,7 +17,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 public class SeatUsageDaily {
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private Long seatId;
     private Long pcroomId;

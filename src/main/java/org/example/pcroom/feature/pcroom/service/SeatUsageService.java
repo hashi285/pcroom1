@@ -21,7 +21,7 @@ public class SeatUsageService {
     private final SeatUsageHourlyRepository seatUsageHourlyRepository;
 
     /**
-     * 하루 단위 사용률 조회
+     * 자리별 사용률 반환
      */
     @Transactional
     public List<SeatUsageDailyResponse> getDailyUsage(Long pcroomId, LocalDate start, LocalDate end) {
