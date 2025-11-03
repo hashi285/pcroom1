@@ -53,7 +53,7 @@ public class SeatUsageRollupScheduler {
      * 30분에 한번씩 ip_result에서 값을 가져와 좌석별 사용시간(초)를 계산 후 seat_usage_hourly에 저장
      */
     @Transactional
-    @Scheduled(cron = "0 30 * * * *") // 매 시각 30분 0초
+//    @Scheduled(cron = "0 30 * * * *") // 매 시각 30분 0초
     public void updateHourlySeatUsage(List<IpResult> results, Long pcroomId, LocalDateTime now) {
         LocalDate date = now.toLocalDate();
         int hour = now.getHour();
