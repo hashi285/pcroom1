@@ -67,6 +67,7 @@ public class SecurityConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
         configuration.addAllowedOrigin("http://localhost:3000"); // React dev server
+        configuration.addAllowedOrigin("https://pcroom.duckdns.org"); // 배포 도메인 추가
         configuration.addAllowedMethod("*"); // GET, POST, DELETE 등 모든 메서드 허용
         configuration.addAllowedHeader("*"); // 모든 헤더 허용
         configuration.setAllowCredentials(true); // 쿠키/인증 허용
