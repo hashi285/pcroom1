@@ -100,7 +100,7 @@ public class PingService {
     }
 
     /**
-     * 실제 Ping 수행 (1초 제한)
+     * 실제 Ping 수행 (2초 제한)
      */
     private boolean ping(String ip) {
         try {

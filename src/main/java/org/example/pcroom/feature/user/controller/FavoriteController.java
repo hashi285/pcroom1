@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/favorites")
+@RequestMapping("api/favorites")
 @RequiredArgsConstructor
 @Tag(name = "즐겨찾기 API", description = "회원이 즐겨찾기 기능을 사용합니다.")
 public class FavoriteController {
