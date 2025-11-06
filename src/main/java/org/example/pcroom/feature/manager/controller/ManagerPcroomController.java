@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("manager-favorites")
+@RequestMapping("api/manager-favorites")
 @RequiredArgsConstructor
 @Tag(name = "피시방 매니저 API(경쟁 피시방 등록 관련)", description = "피시방 매니저가 경쟁 피시방을 등록/조회/삭제합니다.")
 public class ManagerPcroomController {
