@@ -20,7 +20,7 @@ import java.util.List;
 @RestController
 @RequestMapping("api/notices")
 @RequiredArgsConstructor
-@Tag(name = "앱 공지사항", description = "이용자들에게 보여지는 피시방 관련 공지사항입니다.")
+@Tag(name = "앱 공지사항", description = "이용자들에게 보여지는 피시방 git 관련 공지사항입니다.")
 public class NoticeController {
     private final NoticeService noticeService;
 
