@@ -9,4 +9,6 @@ public class PingUtilizationDto {
     private Long pcroomId;
     private String nameOfPcroom;
     private double utilization;
+    private Integer seatCount;
+    private Integer usedSeatCount;
 }
