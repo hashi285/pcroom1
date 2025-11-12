@@ -46,6 +46,13 @@ public class PcroomDto {
         private final int height;
     }
 
+    @Getter
+    @RequiredArgsConstructor
+    public static class PcroomInfo{
+        private final String nameOfPcroom;
+        private final Integer seatCount;
+    }
+
 
     public static PcroomDto fromEntity(Pcroom pcroom) {
         return new PcroomDto(

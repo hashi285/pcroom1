@@ -1,5 +1,6 @@
 package org.example.pcroom.feature.pcroom.service;
 
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
@@ -183,5 +184,17 @@ public class PcroomService {
         }
 
         return groups;
+    }
+
+
+    @Transactional
+    public PcroomDto.PcroomInfo getPcroomInfo(Long pcroomId) {
+        Pcroom pcroom = pcroomRepository.findById(pcroomId)
+                .orElseThrow(() -> new EntityNotFoundException("해당 피시방을 찾을 수 없습니다. ID=" + pcroomId));
+
+        return new PcroomDto.PcroomInfo(
+                pcroom.getNameOfPcroom(),
+                pcroom.getSeatCount()
+        );
     }
 }

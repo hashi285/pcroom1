@@ -81,4 +81,11 @@ public class PcRoomController {
         return ResponseEntity.ok(usageList);
     }
 
+    @GetMapping("/pcroomInfo/{pcroomId}")
+    @Operation(summary = "피시방의 기본 정보를 반환합니다.")
+    public ResponseEntity<PcroomDto.PcroomInfo> getPcroomInfo(@PathVariable Long pcroomId) {
+        PcroomDto.PcroomInfo pcroomInfo = pcRoomService.getPcroomInfo(pcroomId);
+        return ResponseEntity.ok(pcroomInfo);
+    }
+
 }
