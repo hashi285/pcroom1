@@ -24,5 +24,8 @@ public interface FavoriteRepository extends JpaRepository<Favorite, Long> {
             "WHERE f.userId = :userId")
     List<FavoriteDto> findFavoritePcroomsByUserId(@Param("userId") Long userId);
 
+    List<Favorite> findByUserId(Long userId);
+
+
 
 }
