@@ -127,8 +127,9 @@ public class PingService {
         utilization.setTime(now);
         utilization.setUtilization(utilizationRate);
         utilizationRepository.save(utilization);
-
         Long utilizationId = utilization.getUtilizationId();
+
+
 
         // 30분 단위 체크
         int minute = now.getMinute();

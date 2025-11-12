@@ -37,11 +37,20 @@ public class PcroomService {
         double utilization = pingService.ping(pcRoomId);
         Optional<Pcroom> pcroom = pcroomRepository.findByPcroomId(pcRoomId);
         String name = pcroom.get().getNameOfPcroom();
+        Integer seatCount = pcroomRepository.findByPcroomId(pcRoomId)
+                .map(Pcroom::getSeatCount)
+                .orElse(0);
+
+        Integer usedSeatCount = (int) (seatCount * utilization/100);
+
+
 
         return new PingUtilizationDto(
                 pcRoomId,
                 name,
-                utilization
+                utilization,
+                seatCount,
+                usedSeatCount
         );
     }
 
