@@ -9,6 +9,4 @@ import java.util.Optional;
 
 public interface UtilizationRepository extends JpaRepository<Utilization, Long> {
     Optional<Utilization> findTopByPcroomIdOrderByTimeDesc(Long pcroomId);
-    List<Utilization> findAllByPcroomIdInOrderByTimeDesc(List<Long> pcroomIds);
-
 }

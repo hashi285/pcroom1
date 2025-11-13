@@ -50,7 +50,26 @@ public class PcroomDto {
     @RequiredArgsConstructor
     public static class PcroomInfo{
         private final String nameOfPcroom;
-        private final Integer seatCount;
+        private final int width;
+        private final int height;
+
+    }
+
+    @Getter
+    @RequiredArgsConstructor
+    public static class seatInfo{
+        private final Long pcroomId;
+        private final Integer seatsNum;
+        private final int x;
+        private final int y;
+    }
+
+    @Getter
+    @RequiredArgsConstructor
+    public static class SeatStatusDto {
+        private final Long seatId;
+        private final Boolean result;
+
     }
 
 
