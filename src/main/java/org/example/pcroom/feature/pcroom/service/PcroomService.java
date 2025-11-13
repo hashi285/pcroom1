@@ -3,18 +3,21 @@ package org.example.pcroom.feature.pcroom.service;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import lombok.SneakyThrows;
+import org.example.pcroom.feature.pcroom.dto.IpResultDto;
 import org.example.pcroom.feature.pcroom.dto.PcroomDto;
 import org.example.pcroom.feature.pcroom.dto.PingUtilizationDto;
 import org.example.pcroom.feature.pcroom.dto.SeatsDto;
+import org.example.pcroom.feature.pcroom.entity.IpResult;
 import org.example.pcroom.feature.pcroom.entity.Pcroom;
 import org.example.pcroom.feature.pcroom.entity.Seat;
+import org.example.pcroom.feature.pcroom.repository.IpResultRepository;
 import org.example.pcroom.feature.pcroom.repository.PcroomRepository;
 import org.example.pcroom.feature.pcroom.repository.SeatRepository;
 import org.example.pcroom.feature.user.service.UserService;
 import org.springframework.stereotype.Service;
+
+import java.time.LocalDateTime;
 import java.util.*;
-import java.util.concurrent.ExecutionException;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -25,6 +28,7 @@ public class PcroomService {
     private final PcroomRepository pcroomRepository;
     private final SeatRepository seatRepository;
     private final UserService userService;
+    private final IpResultRepository ipResultRepository;
 
 
     /**
@@ -188,13 +192,10 @@ public class PcroomService {
                     }
                 }
             }
-
             groups.add(group);
         }
-
         return groups;
     }
-
 
     @Transactional
     public PcroomDto.PcroomInfo getPcroomInfo(Long pcroomId) {
@@ -203,7 +204,35 @@ public class PcroomService {
 
         return new PcroomDto.PcroomInfo(
                 pcroom.getNameOfPcroom(),
-                pcroom.getSeatCount()
+                pcroom.getWidth(),
+                pcroom.getHeight()
         );
     }
+
+    @Transactional // 좌석별 정보 조회
+    public List<PcroomDto.seatInfo> seatInfo(Long pcroomId) {
+        return seatRepository.findByPcroomId(pcroomId).stream()
+                .map(seat -> new PcroomDto.seatInfo(
+                        pcroomId, // 또는 seat.getPcroomId()
+                        seat.getSeatsNum(),
+                        seat.getX(),
+                        seat.getY()
+                ))
+                .toList();
+    }
+
+    @Transactional // 좌석별 생존리스트 반환
+    public List<IpResultDto.SeatStatusDto> getLatestSeatResults (Long pcroomId) {
+        List<IpResult> latestSeats = ipResultRepository.findLatestByPcroomIdBeforeNow(pcroomId, LocalDateTime.now());
+
+        return latestSeats.stream()
+                .map(ipResult -> {
+                    Seat seat = seatRepository.findById(ipResult.getSeatId())
+                            .orElseThrow(() -> new EntityNotFoundException("좌석 정보를 찾을 수 없습니다. seatId=" + ipResult.getSeatId()));
+
+                    return new IpResultDto.SeatStatusDto(seat.getSeatsNum(), ipResult.getResult());
+                })
+                .toList();
+    }
+
 }

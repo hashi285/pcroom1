@@ -130,10 +130,6 @@ public class PingService {
         Long utilizationId = utilization.getUtilizationId();
 
 
-
-        // 30분 단위 체크
-        int minute = now.getMinute();
-        if (minute % 30 == 0) {
             for (IpResult r : results) {
                 // IpResult에 utilizationId 주입 후 저장
                 r.setUtilizationId(utilizationId);
@@ -144,7 +140,7 @@ public class PingService {
                         Collections.singletonList(r), pcroomId, now
                 );
             }
-        }
+
 
         return utilizationRate;
     }
