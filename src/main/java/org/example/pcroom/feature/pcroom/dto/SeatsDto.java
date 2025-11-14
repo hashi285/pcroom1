@@ -31,11 +31,5 @@ public class SeatsDto {
         return seat;
     }
 
-    @Getter
-    @AllArgsConstructor
-    public static class recommendation{
-        private final String nameOfPcroom;
-        private final Integer seatsNum;
-    }
 }
 

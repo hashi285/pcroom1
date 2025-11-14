@@ -6,7 +6,6 @@ import lombok.RequiredArgsConstructor;
 import org.example.pcroom.feature.manager.dto.ManagerPcroomDto;
 import org.example.pcroom.feature.manager.repository.CompetitorRelationRepository;
 import org.example.pcroom.feature.manager.service.ManagerService;
-import org.example.pcroom.feature.pcroom.service.PcroomService;
 import org.example.pcroom.global.config.security.CustomUserDetails;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;

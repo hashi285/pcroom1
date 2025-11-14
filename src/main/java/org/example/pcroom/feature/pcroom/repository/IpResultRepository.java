@@ -8,11 +8,9 @@ import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
 
 @Repository
 public interface IpResultRepository extends JpaRepository<IpResult, Long> {
-    Optional<IpResult> findTopByPcroomId(Long pcroomId);
 
     @Query("""
     SELECT i

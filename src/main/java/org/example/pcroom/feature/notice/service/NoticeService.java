@@ -5,7 +5,6 @@ import lombok.RequiredArgsConstructor;
 import org.example.pcroom.feature.notice.dto.NoticeDto;
 import org.example.pcroom.feature.notice.entity.Notice;
 import org.example.pcroom.feature.notice.repository.NoticeRepository;
-import org.example.pcroom.feature.user.entity.Favorite;
 import org.example.pcroom.feature.user.repository.FavoriteRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
