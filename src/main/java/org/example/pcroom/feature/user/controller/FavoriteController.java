@@ -20,6 +20,7 @@ public class FavoriteController {
 
     private final UserService userService;
 
+
     @PostMapping("/{pcroomId}")
     @Operation(summary = "즐겨찾기 추가")
     public ResponseEntity<Void> addFavorite(Authentication authentication, @PathVariable Long pcroomId) {
@@ -37,10 +38,19 @@ public class FavoriteController {
     }
 
     @GetMapping
-    @Operation(summary = "즐겨찾기 목록 조회")
-    public ResponseEntity<List<FavoriteDto>> getFavoritePcrooms(Authentication authentication) {
+    @Operation(summary = "즐겨찾기 목록 조회 (연속 좌석 포함)")
+    public ResponseEntity<List<FavoriteDto>> getFavoritePcrooms(
+            Authentication authentication,
+            @RequestParam(required = false, defaultValue = "1") Integer partySize
+    ) {
         CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
-        List<FavoriteDto> favorites = userService.isFavorite(userDetails.getUserId());
+
+        List<FavoriteDto> favorites = userService.getFavoritesWithSeatCondition(
+                userDetails.getUserId(),
+                partySize
+        );
+
         return ResponseEntity.ok(favorites);
     }
+
 }
