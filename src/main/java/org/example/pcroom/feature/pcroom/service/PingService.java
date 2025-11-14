@@ -134,11 +134,6 @@ public class PingService {
                 // IpResult에 utilizationId 주입 후 저장
                 r.setUtilizationId(utilizationId);
                 ipResultRepository.save(r);
-
-                // 좌석별 사용시간 누적
-                seatUsageService.updateHourlySeatUsage(
-                        Collections.singletonList(r), pcroomId, now
-                );
             }
 
 
