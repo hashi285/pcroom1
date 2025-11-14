@@ -36,33 +36,6 @@ public class SeatUsageService {
                 .toList();
     }
 
-    /**
-     * 30분마다 호출: IpResult 기반으로 시간 단위 좌석 사용시간(초) 누적
-     */
-    @Transactional
-    public void updateHourlySeatUsage(List<IpResult> results, Long pcroomId, LocalDateTime now) {
-        LocalDate date = now.toLocalDate();
-        int hour = now.getHour();
 
-        for (IpResult r : results) {
-            Long seatId = r.getSeatId();
-            boolean isAlive = r.getResult();
-
-            SeatUsageHourly hourly = seatUsageHourlyRepository
-                    .findBySeatIdAndPcroomIdAndDateHour(seatId, pcroomId, date, hour)
-                    .orElseGet(() -> SeatUsageHourly.builder()
-                            .seatId(seatId)
-                            .pcroomId(pcroomId)
-                            .usedSeconds(0)
-                            .createdAt(now)
-                            .build());
-
-            if (isAlive) {
-                hourly.setUsedSeconds(hourly.getUsedSeconds() + 1800); // 30분 누적
-            }
-
-            seatUsageHourlyRepository.save(hourly);
-        }
-    }
 
 }
