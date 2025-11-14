@@ -17,11 +17,4 @@ public class UserListDto {
     private UserRole role;
     private LocalDateTime createDate;
 
-    public static class showUserList {
-
-        private Long userId;
-        private String userName;
-        private String email;
-        private UserRole role;
-    }
 }

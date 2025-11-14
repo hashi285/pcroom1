@@ -18,12 +18,6 @@ public interface PcroomRepository extends JpaRepository<Pcroom, Long> {
     // 이름에 특정 문자열이 포함된 피시방 검색 (LIKE %name%)
     List<Pcroom> findByNameOfPcroomContaining(String name);
 
-    // 또는 LIKE 수동 지정
-    @Query("SELECT p FROM Pcroom p WHERE p.nameOfPcroom LIKE %:name%")
-    List<Pcroom> searchByNameLike(@Param("name") String name);
-
-    List<Pcroom> findByNameOfPcroomIn(List<String> nameOfPcroom);
-
     List<Pcroom> findAllByOrderByNameOfPcroom();
 
     @Query("SELECT p.pcroomId FROM Pcroom p")
