@@ -10,6 +10,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -53,4 +54,13 @@ public interface SeatUsageHourlyRepository extends JpaRepository<SeatUsageHourly
         WHERE FUNCTION('DATE', s.createdAt) = :date
     """)
     void deleteByDate(@Param("date") LocalDate date);
+
+
+    List<SeatUsageHourly> findByPcroomIdAndCreatedAt(Long pcroomId, LocalDateTime createdAt);
+
+
+    // 특정 PC방, 특정 시간 범위에 해당하는 Hourly 조회
+    List<SeatUsageHourly> findByPcroomIdAndCreatedAtBetween(Long pcroomId, LocalDateTime start, LocalDateTime end);
+
+
 }
