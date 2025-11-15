@@ -99,4 +99,6 @@ public class PcroomController {
         List<IpResultDto.SeatStatusDto> latestSeats = pcroomService.getLatestSeatResults(pcroomId);
         return ResponseEntity.ok(latestSeats);
     }
+
+
 }

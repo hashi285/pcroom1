@@ -14,11 +14,14 @@ import org.example.pcroom.feature.pcroom.repository.IpResultRepository;
 import org.example.pcroom.feature.pcroom.repository.PcroomRepository;
 import org.example.pcroom.feature.pcroom.repository.SeatRepository;
 import org.springframework.stereotype.Service;
+import lombok.extern.slf4j.Slf4j;
+
 
 import java.time.LocalDateTime;
 import java.util.*;
 
 @Service
+@Slf4j
 @RequiredArgsConstructor
 public class PcroomService {
     private final PingService pingService;
@@ -143,18 +146,41 @@ public class PcroomService {
                 .toList();
     }
 
-    @Transactional // 좌석별 생존리스트 반환
-    public List<IpResultDto.SeatStatusDto> getLatestSeatResults (Long pcroomId) {
-        List<IpResult> latestSeats = ipResultRepository.findLatestByPcroomIdBeforeNow(pcroomId, LocalDateTime.now());
+    @Transactional
+    public List<IpResultDto.SeatStatusDto> getLatestSeatResults(Long pcroomId) {
+        long startTotal = System.currentTimeMillis();
 
-        return latestSeats.stream()
+        long startLatestQuery = System.currentTimeMillis();
+        List<IpResult> latestSeats = ipResultRepository
+                .findLatestByPcroomIdBeforeNow(pcroomId, LocalDateTime.now());
+        long endLatestQuery = System.currentTimeMillis();
+        log.info("[getLatestSeatResults] Latest IpResult fetch: {} ms, count={}",
+                (endLatestQuery - startLatestQuery), latestSeats.size());
+
+        long startSeatLookup = System.currentTimeMillis();
+        List<IpResultDto.SeatStatusDto> result = latestSeats.stream()
                 .map(ipResult -> {
+                    long seatStart = System.currentTimeMillis();
                     Seat seat = seatRepository.findById(ipResult.getSeatId())
-                            .orElseThrow(() -> new EntityNotFoundException("좌석 정보를 찾을 수 없습니다. seatId=" + ipResult.getSeatId()));
+                            .orElseThrow(() -> new EntityNotFoundException(
+                                    "Seat not found. seatId=" + ipResult.getSeatId()));
+                    long seatEnd = System.currentTimeMillis();
+
+                    log.debug("[getLatestSeatResults] Seat lookup seatId={} took={} ms",
+                            ipResult.getSeatId(), (seatEnd - seatStart));
 
                     return new IpResultDto.SeatStatusDto(seat.getSeatsNum(), ipResult.getResult());
                 })
                 .toList();
+        long endSeatLookup = System.currentTimeMillis();
+
+        long endTotal = System.currentTimeMillis();
+
+        log.info("[getLatestSeatResults] Seat lookup total: {} ms", (endSeatLookup - startSeatLookup));
+        log.info("[getLatestSeatResults] Total execution: {} ms", (endTotal - startTotal));
+
+        return result;
     }
+
 
 }
