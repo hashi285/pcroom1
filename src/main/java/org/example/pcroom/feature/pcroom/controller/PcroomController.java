@@ -50,24 +50,6 @@ public class PcroomController {
         return ResponseEntity.ok(result);
     }
 
-
-    // 피시방 자리 추천 알고리즘
-//    @PostMapping("/recommendation")
-//    @Operation(summary = "자리 추천", description = "사용 가능한 자리를 추천한다.")
-//    public List<Pcroom> recommendation (Authentication authentication,
-//                                        @RequestBody Integer partySize){
-//
-//        // CustomUserDetails로 캐스팅
-//        CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
-//        Long userId = userDetails.getUserId();
-//
-//        try {
-//            return pcRoomService.recommendation(partySize,userId);
-//        } catch (ExecutionException e) {
-//            throw new RuntimeException(e);
-//        }
-//    }
-
     @GetMapping("/사용률/{pcroomId}")
     @Operation(summary = "자리별 사용률을 반환한다.")
     public ResponseEntity<List<SeatUsageDailyResponse>> getSeatUsage(
