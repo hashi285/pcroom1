@@ -64,4 +64,33 @@ public class ManagerPcroomController {
 
         return ResponseEntity.ok(result);
     }
+
+    @GetMapping("/detail")
+    @Operation(summary = "1시간 단위 가동률 조회", description = "등록한 피시방들의 1시간 단위 가동률을 조회합니다. hours 파라미터로 최근 n시간 선택 가능, pcroomId 파라미터로 특정 피시방 조회 가능")
+    public ResponseEntity<List<ManagerPcroomDto.FindHourlyUtilization>> getHourlyUtilization(
+            Authentication authentication,
+            @RequestParam(defaultValue = "24") int hours,
+            @RequestParam(required = false) List<Long> pcroomId // 선택적으로 특정 피시방만
+    ) {
+        CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+
+        List<Long> registeredPcroomIds = competitorRelationRepository.findPcroomIdByUserId(userDetails.getUserId());
+
+        List<Long> pcroomIdsToQuery;
+        if (pcroomId != null && !pcroomId.isEmpty()) {
+            // 사용자 요청과 등록 피시방 중 교집합만 조회
+            pcroomIdsToQuery = registeredPcroomIds.stream()
+                    .filter(pcroomId::contains)
+                    .toList();
+        } else {
+            pcroomIdsToQuery = registeredPcroomIds;
+        }
+
+        List<ManagerPcroomDto.FindHourlyUtilization> result = managerService.getHourlyUtilization(pcroomIdsToQuery, hours);
+
+        return ResponseEntity.ok(result);
+    }
+
+
+
 }

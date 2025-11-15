@@ -14,6 +14,7 @@ import org.example.pcroom.feature.pcroom.repository.PcroomRepository;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -70,11 +71,28 @@ public class ManagerService {
     // 피시방 리스트 + 최근 n시간 조회
     @Transactional
     public List<ManagerPcroomDto.FindHourlyUtilization> getHourlyUtilization(List<Long> pcroomIds, int hours) {
-        LocalDateTime fromTime = java.time.LocalDateTime.now().minusHours(hours);
+        LocalDateTime fromTime = LocalDateTime.now().minusHours(hours);
 
-        List<PcroomHourlyUtilization> records = pcroomHourlyUtilizationRepository.findByPcroomIdInAndTimeAfter(pcroomIds, fromTime);
+        List<PcroomHourlyUtilization> records =
+                pcroomHourlyUtilizationRepository.findByPcroomIdInAndTimeAfter(pcroomIds, fromTime);
 
-        return records.stream()
+        // 중복 제거: pcroomId + hour 단위 time
+        Map<String, PcroomHourlyUtilization> uniqueMap = new HashMap<>();
+
+        for (PcroomHourlyUtilization r : records) {
+            // Hour 단위로 normalize
+            LocalDateTime hourKey = r.getTime().withMinute(0).withSecond(0).withNano(0);
+
+            String key = r.getPcroomId() + "_" + hourKey.toString();
+
+            // 최신 데이터만 유지
+            if (!uniqueMap.containsKey(key) ||
+                    uniqueMap.get(key).getTime().isBefore(r.getTime())) {
+                uniqueMap.put(key, r);
+            }
+        }
+
+        return uniqueMap.values().stream()
                 .map(r -> {
                     String name = pcroomRepository.findById(r.getPcroomId())
                             .map(Pcroom::getNameOfPcroom)
@@ -88,6 +106,7 @@ public class ManagerService {
                 })
                 .toList();
     }
+
 
     // 사용자가 운영중인 피시방을 보여준다.
     @Transactional
