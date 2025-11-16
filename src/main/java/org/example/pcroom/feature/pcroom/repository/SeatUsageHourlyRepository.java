@@ -49,8 +49,16 @@ public interface SeatUsageHourlyRepository extends JpaRepository<SeatUsageHourly
 
     @Modifying
     @Transactional
-    @Query("DELETE FROM SeatUsageHourly h WHERE h.pcroomId = :pcroomId AND h.date = :date")
-    void deleteByPcroomIdAndDate(@Param("pcroomId") Long pcroomId, @Param("date") LocalDate date);
+    @Query("""
+    DELETE FROM SeatUsageHourly h
+    WHERE h.pcroomId = :pcroomId
+      AND DATE(h.createdAt) = :date
+""")
+    void deleteByPcroomIdAndDate(
+            @Param("pcroomId") Long pcroomId,
+            @Param("date") LocalDate date
+    );
+
 
 
     List<SeatUsageHourly> findByPcroomIdAndCreatedAt(Long pcroomId, LocalDateTime createdAt);
