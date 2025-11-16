@@ -46,14 +46,11 @@ public interface SeatUsageHourlyRepository extends JpaRepository<SeatUsageHourly
     """)
     List<SeatUsageDailyDTO> aggregateDaily(@Param("date") LocalDate date);
 
-    // 특정 날짜의 데이터 삭제
+
     @Modifying
     @Transactional
-    @Query("""
-        DELETE FROM SeatUsageHourly s
-        WHERE FUNCTION('DATE', s.createdAt) = :date
-    """)
-    void deleteByDate(@Param("date") LocalDate date);
+    @Query("DELETE FROM SeatUsageHourly h WHERE h.pcroomId = :pcroomId AND h.date = :date")
+    void deleteByPcroomIdAndDate(@Param("pcroomId") Long pcroomId, @Param("date") LocalDate date);
 
 
     List<SeatUsageHourly> findByPcroomIdAndCreatedAt(Long pcroomId, LocalDateTime createdAt);
