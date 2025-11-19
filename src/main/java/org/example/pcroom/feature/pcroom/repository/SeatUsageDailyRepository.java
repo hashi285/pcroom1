@@ -14,8 +14,5 @@ import java.util.List;
 public interface SeatUsageDailyRepository extends JpaRepository<SeatUsageDaily, Long> {
 
     List<SeatUsageDaily> findAllByPcroomIdAndDateBetween(Long pcroomId, LocalDate start, LocalDate end);
-    List<SeatUsageHourly> findByPcroomIdAndCreatedAtBetween(Long pcroomId, LocalDateTime start, LocalDateTime end);
     List<SeatUsageDaily> findByPcroomIdAndDateBetween(Long pcroomId, LocalDate start, LocalDate end);
-
-
 }

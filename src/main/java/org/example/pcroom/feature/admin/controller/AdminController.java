@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import org.example.pcroom.feature.admin.dto.PcroomListDto;
 import org.example.pcroom.feature.admin.dto.UserListDto;
 import org.example.pcroom.feature.admin.service.AdminService;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
@@ -27,8 +28,8 @@ public class AdminController {
      */
     @Operation(summary = "유저 리스트 반환", description = "유저 리스트를 반환합니다")
     @GetMapping("/users")
-    public List<UserListDto> userList() {
-        return adminService.getAllUsers();
+    public ResponseEntity<List<UserListDto>> userList() {
+        return ResponseEntity.ok().body(adminService.getAllUsers());
     }
 
     /**
@@ -38,8 +39,8 @@ public class AdminController {
      */
     @Operation(summary = "피시방 리스트 반환", description = "피시방 리스트를 반환합니다.")
     @GetMapping("/pcrooms")
-    public List<PcroomListDto> pcroomList() {
-        return adminService.getAllPcroom();
+    public ResponseEntity<List<PcroomListDto>> pcroomList() {
+        return ResponseEntity.ok().body(adminService.getAllPcroom());
     }
 
     /**
