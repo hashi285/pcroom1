@@ -1,7 +1,6 @@
 package org.example.pcroom.feature.pcroom.service;
 
 import jakarta.persistence.EntityNotFoundException;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.example.pcroom.feature.pcroom.dto.IpResultDto;
 import org.example.pcroom.feature.pcroom.dto.PcroomDto;
@@ -13,9 +12,10 @@ import org.example.pcroom.feature.pcroom.entity.Seat;
 import org.example.pcroom.feature.pcroom.repository.IpResultRepository;
 import org.example.pcroom.feature.pcroom.repository.PcroomRepository;
 import org.example.pcroom.feature.pcroom.repository.SeatRepository;
+import org.example.pcroom.global.config.redis.PcroomStatusCacheRepository;
 import org.springframework.stereotype.Service;
 import lombok.extern.slf4j.Slf4j;
-
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.*;
@@ -24,44 +24,54 @@ import java.util.*;
 @Slf4j
 @RequiredArgsConstructor
 public class PcroomService {
+
     private final PingService pingService;
     private final PcroomRepository pcroomRepository;
     private final SeatRepository seatRepository;
     private final IpResultRepository ipResultRepository;
+    private final PcroomStatusCacheRepository pcroomStatusCacheRepository;
 
 
-    /**
-     * @param pcRoomId 조회할 피시방 ID
-     * @return String 형식으로 피시방 가동률  반환
-     * @throws Exception
-     */
-    @Transactional
-    public PingUtilizationDto canUseSeat(Long pcRoomId) throws Exception {
-        double utilization = pingService.ping(pcRoomId);
-        Optional<Pcroom> pcroom = pcroomRepository.findByPcroomId(pcRoomId);
-        String name = pcroom.get().getNameOfPcroom();
-        Integer seatCount = pcroomRepository.findByPcroomId(pcRoomId)
-                .map(Pcroom::getSeatCount)
-                .orElse(0);
+    @Transactional(readOnly = true)
+    public PingUtilizationDto getSeatStatusFromCache(Long pcroomId) throws Exception {
 
-        Integer usedSeatCount = (int) (seatCount * utilization/100);
+        Pcroom pcroom = pcroomRepository.findByPcroomId(pcroomId)
+                .orElseThrow(() -> new IllegalArgumentException("Invalid PC Room ID: " + pcroomId));
 
+        Integer seatCount = pcroom.getSeatCount();
 
+        log.info("[getSeatStatusFromCache] 조회 시작 - pcroomId={}, seatCount={}", pcroomId, seatCount);
+
+        PingUtilizationDto.UtilizationAndResults cached = pcroomStatusCacheRepository.getPcroomStatus(pcroomId);
+
+        if (cached == null) {
+            log.info("[getSeatStatusFromCache] Redis MISS → Ping 실행 - key={}", pcroomId);
+            cached = pingService.ping(pcroomId);
+
+            pcroomStatusCacheRepository.savePcroomStatus(cached);
+            log.info("[getSeatStatusFromCache] Redis 저장 완료 - key={}", pcroomId);
+        }
+
+        int activeSeats = (int) cached.getResult().stream()
+                .filter(IpResult::getResult)
+                .count();
+
+        double utilization = ((double) activeSeats / seatCount) * 100.0;
 
         return new PingUtilizationDto(
-                pcRoomId,
-                name,
+                pcroomId,
+                pcroom.getNameOfPcroom(),
                 utilization,
                 seatCount,
-                usedSeatCount
+                activeSeats
         );
     }
 
+
+
+
     /**
-     * 피시방 저장
-     *
-     * @param request
-     * @return
+     * 신규 PC방 등록
      */
     @Transactional
     public PcroomDto.ReadPcRoomResponse registerNewPcroom(PcroomDto.CreatePcRoomRequest request) {
@@ -73,6 +83,7 @@ public class PcroomService {
                 request.getWidth(),
                 request.getHeight()
         );
+
         pcroomRepository.save(pcroom);
 
         return new PcroomDto.ReadPcRoomResponse(
@@ -85,19 +96,24 @@ public class PcroomService {
         );
     }
 
+
     /**
-     * 피시방 자리 저장
-     * @param seatsDtos
-     * @return
+     * 좌석 등록 (PC방 전체 좌석 일괄 등록 방식)
+     *
+     * 정책: 좌석 입력 개수 != 등록된 수량 → 예외 처리
      */
     @Transactional
     public List<SeatsDto> registerNewSeat(List<SeatsDto> seatsDtos) {
+
         String nameOfPcroom = seatsDtos.getFirst().getNameOfPcroom();
+
         Pcroom pcroom = pcroomRepository.findByNameOfPcroom(nameOfPcroom)
                 .orElseThrow(() -> new IllegalArgumentException("해당 피시방 없음: " + nameOfPcroom));
+
         int seatNum = pcroom.getSeatCount();
-        if(seatsDtos.size() != seatNum) {
-            throw new IllegalArgumentException(nameOfPcroom + "피시방은 좌석을 " + seatNum + "개만 입력이 가능합니다.");
+
+        if (seatsDtos.size() != seatNum) {
+            throw new IllegalArgumentException(nameOfPcroom + " 피시방은 좌석을 " + seatNum + "개만 입력할 수 있습니다.");
         }
 
         List<Seat> seats = seatsDtos.stream()
@@ -105,13 +121,13 @@ public class PcroomService {
                 .toList();
 
         seatRepository.saveAll(seats);
-        return null;
+
+        return seatsDtos;
     }
 
+
     /**
-     * 피시방 검색
-     * @param name
-     * @return
+     * PC방 검색 (목록 조회)
      */
     @Transactional
     public List<PcroomDto> searchPcrooms(String name) {
@@ -121,11 +137,13 @@ public class PcroomService {
     }
 
 
-
+    /**
+     * PC방 환경 정보 조회 (레이아웃 등)
+     */
     @Transactional
     public PcroomDto.PcroomInfo getPcroomInfo(Long pcroomId) {
         Pcroom pcroom = pcroomRepository.findById(pcroomId)
-                .orElseThrow(() -> new EntityNotFoundException("해당 피시방을 찾을 수 없습니다. ID=" + pcroomId));
+                .orElseThrow(() -> new EntityNotFoundException("PC방 정보 없음. ID=" + pcroomId));
 
         return new PcroomDto.PcroomInfo(
                 pcroom.getNameOfPcroom(),
@@ -134,11 +152,16 @@ public class PcroomService {
         );
     }
 
-    @Transactional // 좌석별 정보 조회
+
+    /**
+     * 좌석 좌표 정보 조회
+     * 클라이언트 UI 렌더링에 사용됨
+     */
+    @Transactional
     public List<PcroomDto.seatInfo> seatInfo(Long pcroomId) {
         return seatRepository.findByPcroomId(pcroomId).stream()
                 .map(seat -> new PcroomDto.seatInfo(
-                        pcroomId, // 또는 seat.getPcroomId()
+                        pcroomId,
                         seat.getSeatsNum(),
                         seat.getX(),
                         seat.getY()
@@ -146,41 +169,29 @@ public class PcroomService {
                 .toList();
     }
 
+
+    /**
+     * 가장 최신 Ping 결과 조회
+     * Redis 캐시가 아니라 DB Persistence Layer에서 조회하는 방식
+     */
     @Transactional
     public List<IpResultDto.SeatStatusDto> getLatestSeatResults(Long pcroomId) {
-        long startTotal = System.currentTimeMillis();
 
-        long startLatestQuery = System.currentTimeMillis();
-        List<IpResult> latestSeats = ipResultRepository
-                .findLatestByPcroomIdBeforeNow(pcroomId, LocalDateTime.now());
-        long endLatestQuery = System.currentTimeMillis();
-        log.info("[getLatestSeatResults] Latest IpResult fetch: {} ms, count={}",
-                (endLatestQuery - startLatestQuery), latestSeats.size());
+        long start = System.currentTimeMillis();
 
-        long startSeatLookup = System.currentTimeMillis();
-        List<IpResultDto.SeatStatusDto> result = latestSeats.stream()
-                .map(ipResult -> {
-                    long seatStart = System.currentTimeMillis();
-                    Seat seat = seatRepository.findById(ipResult.getSeatId())
-                            .orElseThrow(() -> new EntityNotFoundException(
-                                    "Seat not found. seatId=" + ipResult.getSeatId()));
-                    long seatEnd = System.currentTimeMillis();
+        List<IpResult> latest = ipResultRepository.findLatestByPcroomIdBeforeNow(pcroomId, LocalDateTime.now());
 
-                    log.debug("[getLatestSeatResults] Seat lookup seatId={} took={} ms",
-                            ipResult.getSeatId(), (seatEnd - seatStart));
+        log.info("[getLatestSeatResults] DB Latency={}ms count={}",
+                (System.currentTimeMillis() - start), latest.size());
 
-                    return new IpResultDto.SeatStatusDto(seat.getSeatsNum(), ipResult.getResult());
+        return latest.stream()
+                .map(result -> {
+
+                    Seat seat = seatRepository.findById(result.getSeatId())
+                            .orElseThrow(() -> new EntityNotFoundException("좌석 정보 없음 seatId=" + result.getSeatId()));
+
+                    return new IpResultDto.SeatStatusDto(seat.getSeatsNum(), result.getResult());
                 })
                 .toList();
-        long endSeatLookup = System.currentTimeMillis();
-
-        long endTotal = System.currentTimeMillis();
-
-        log.info("[getLatestSeatResults] Seat lookup total: {} ms", (endSeatLookup - startSeatLookup));
-        log.info("[getLatestSeatResults] Total execution: {} ms", (endTotal - startTotal));
-
-        return result;
     }
-
-
 }
