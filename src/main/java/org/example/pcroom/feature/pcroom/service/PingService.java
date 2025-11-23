@@ -3,7 +3,9 @@ package org.example.pcroom.feature.pcroom.service;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.example.pcroom.feature.pcroom.dto.IpResultDto;
+import org.example.pcroom.feature.pcroom.dto.PingUtilizationDto;
 import org.example.pcroom.feature.pcroom.entity.IpResult;
 import org.example.pcroom.feature.pcroom.entity.Seat;
 import org.example.pcroom.feature.pcroom.entity.Utilization;
@@ -21,30 +23,22 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class PingService {
 
     private final UtilizationRepository utilizationRepository;
     private final SeatRepository seatRepository;
     private final IpResultRepository ipResultRepository;
-    private final SeatUsageService seatUsageService;
 
     /**
      * 메인 Ping 실행 메서드
      */
     @Transactional
-    public double ping(Long pcroomId) throws ExecutionException, InterruptedException {
-
-        Optional<Utilization> utilization = utilizationRepository.findTopByPcroomIdOrderByTimeDesc(pcroomId);
-
-        // DB에 기록이 없으면 고정값, 있으면 DB값 사용
-        LocalDateTime lastTime = utilization
-                .map(Utilization::getTime)
-                .orElse(LocalDateTime.of(2024, 9, 14, 15, 30, 0));
+    public PingUtilizationDto.UtilizationAndResults ping(Long pcroomId) throws ExecutionException, InterruptedException {
 
         LocalDateTime now = LocalDateTime.now();
 
         // 1분 이상 지난 경우만 Ping 수행
-        if (lastTime.isBefore(now.minusMinutes(1))) {
             List<Seat> seats = seatRepository.findByPcroomId(pcroomId);
 
             // 좌석 IP 리스트
@@ -56,18 +50,17 @@ public class PingService {
             Map<String, Seat> ipToSeat = seats.stream()
                     .collect(Collectors.toMap(Seat::getSeatsIp, Function.identity()));
 
-            System.out.println("Ping 수행 시작");
+            log.info("ping 작업 시작");
+
+
             return performParallelPing(ipList, ipToSeat, pcroomId, now);
-        } else {
-            System.out.println("최근 데이터 재활용");
-            return utilization.get().getUtilization();
-        }
+
     }
 
     /**
      * 병렬로 Ping 수행 + 결과 수집
      */
-    private double performParallelPing(List<String> ipList, Map<String, Seat> ipToSeat,
+    private PingUtilizationDto.UtilizationAndResults performParallelPing(List<String> ipList, Map<String, Seat> ipToSeat,
                                        Long pcroomId, LocalDateTime now)
             throws InterruptedException, ExecutionException {
 
@@ -97,7 +90,18 @@ public class PingService {
 
         executor.shutdown();
 
-        return saveUtilizationAndResults(results, pcroomId, now);
+        // 살아있는 좌석 수 계산
+        double aliveCount = results.stream().filter(IpResult::getResult).count();
+        double utilization = Math.round((aliveCount / results.size() * 100.0) * 100) / 100.0;
+
+        return new PingUtilizationDto.UtilizationAndResults(
+
+                results,
+                pcroomId,
+                utilization,
+                now
+        );
+
     }
 
     /**
@@ -111,35 +115,7 @@ public class PingService {
         }
     }
 
-    /**
-     * Utilization + IpResult 저장
-     */
-    @Transactional
-    protected double saveUtilizationAndResults(List<IpResult> results, Long pcroomId, LocalDateTime now) {
-        if (results.isEmpty()) return 0.0;
 
-        // 살아있는 좌석 수 계산
-        double aliveCount = results.stream().filter(IpResult::getResult).count();
-        double utilizationRate = Math.round((aliveCount / results.size() * 100.0) * 100) / 100.0;
-
-        // Utilization 저장
-        Utilization utilization = new Utilization();
-        utilization.setPcroomId(pcroomId);
-        utilization.setTime(now);
-        utilization.setUtilization(utilizationRate);
-        utilizationRepository.save(utilization);
-        Long utilizationId = utilization.getUtilizationId();
-
-
-            for (IpResult r : results) {
-                // IpResult에 utilizationId 주입 후 저장
-                r.setUtilizationId(utilizationId);
-                ipResultRepository.save(r);
-            }
-
-
-        return utilizationRate;
-    }
 
 
     @Transactional
@@ -157,4 +133,32 @@ public class PingService {
                 .toList();
     }
 
+
+    /**
+     *
+     * @param results List(seatId, seatNum, isAlive)
+     * @param pcroomId 피시방 Id
+     * @param now 현재 시각
+     * @return 가동률
+     */
+
+    @Transactional
+    public void saveUtilizationAndResults(List<IpResult> results, Long pcroomId, double utilizationRate, LocalDateTime now) {
+
+
+        // Utilization 저장
+        Utilization utilization = new Utilization();
+        utilization.setPcroomId(pcroomId);
+        utilization.setTime(now);
+        utilization.setUtilization(utilizationRate);
+        utilizationRepository.save(utilization);
+        Long utilizationId = utilization.getUtilizationId();
+
+
+        for (IpResult r : results) {
+            // IpResult에 utilizationId 주입 후 저장
+            r.setUtilizationId(utilizationId);
+            ipResultRepository.save(r);
+        }
+    }
 }

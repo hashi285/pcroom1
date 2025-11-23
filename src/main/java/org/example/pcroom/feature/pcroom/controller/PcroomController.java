@@ -3,6 +3,7 @@ package org.example.pcroom.feature.pcroom.controller;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.example.pcroom.feature.pcroom.dto.IpResultDto;
 import org.example.pcroom.feature.pcroom.dto.PcroomDto;
 import org.example.pcroom.feature.pcroom.dto.PingUtilizationDto;
@@ -14,29 +15,25 @@ import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
 import java.util.List;
-import java.util.concurrent.ExecutionException;
 
 @RequestMapping("api/pcrooms")
 @RestController
 @RequiredArgsConstructor
+@Slf4j
 @Tag(name = "앱 주요 기능 API", description = "이 앱의 주요 기능이 모여있는 API 입니다. 모든 회원이 사용합니다.")
 
 public class PcroomController {
     private final PcroomService pcroomService;
     private final SeatUsageService seatUsageService;
 
-    /** 완료
-     *
-     * @param pcroomId
-     * @return
-     * @throws Exception
+    /**
+     * Redis 캐시에서 피시방 좌석 상태 조회
+     * 캐시 없으면 Ping 수행 후 저장 후 반환
      */
-    @GetMapping("/{pcroomId}/utilization")
-    @Operation(summary = "피시방 가동률 확인", description = "피시방 가동률 반환")
-    public PingUtilizationDto getSeats(@PathVariable Long pcroomId) throws Exception {
-        return pcroomService.canUseSeat(pcroomId);
+    @GetMapping("/{pcroomId}/utilization")ResponseEntity<PingUtilizationDto> getPcroomStatus(@PathVariable Long pcroomId) throws Exception {
+            log.info("메서드 시각-----------------------------------------------------------");
+        return ResponseEntity.ok().body(pcroomService.getSeatStatusFromCache(pcroomId));
     }
-
 
     /**
      * 피시방 검색
@@ -77,7 +74,7 @@ public class PcroomController {
 
     @GetMapping("/{pcroomId}/seat")
     @Operation(summary = "피시방 좌석별 최신 상태 반환")
-    public ResponseEntity<List<IpResultDto.SeatStatusDto>> getLatestSeats(@PathVariable Long pcroomId) throws ExecutionException, InterruptedException {
+    public ResponseEntity<List<IpResultDto.SeatStatusDto>> getLatestSeats(@PathVariable Long pcroomId)  {
         List<IpResultDto.SeatStatusDto> latestSeats = pcroomService.getLatestSeatResults(pcroomId);
         return ResponseEntity.ok(latestSeats);
     }

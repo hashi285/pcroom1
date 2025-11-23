@@ -1,12 +1,13 @@
 package org.example.pcroom.feature.pcroom.scheduler;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.example.pcroom.feature.pcroom.dto.PingUtilizationDto;
 import org.example.pcroom.feature.pcroom.entity.Pcroom;
 import org.example.pcroom.feature.pcroom.repository.PcroomRepository;
 import org.example.pcroom.feature.pcroom.repository.SeatUsageHourlyRepository;
 import org.example.pcroom.feature.pcroom.service.PingService;
 import org.example.pcroom.feature.pcroom.service.SeatUsageDailyService;
-import org.example.pcroom.feature.pcroom.service.SeatUsageHourlyService;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
@@ -14,14 +15,14 @@ import java.time.LocalDate;
 import java.util.List;
 @Component
 @RequiredArgsConstructor
+@Slf4j
 public class PingScheduler {
 
     private final PingService pingService;
     private final PcroomRepository pcroomRepository;
-    private final SeatUsageHourlyService seatUsageHourlyService;
     private final SeatUsageDailyService seatUsageDailyService;
-
     private final SeatUsageHourlyRepository seatUsageHourlyRepository;
+
     /**
      * 30분마다 모든 PC방 좌석별 사용량 기록
      */
@@ -35,14 +36,18 @@ public class PingScheduler {
         for (Long pcroomId : pcroomIds) {
             try {
                 // 1. Ping 수행 → IpResult + Utilization 저장
-                pingService.ping(pcroomId);
+                PingUtilizationDto.UtilizationAndResults list = pingService.ping(pcroomId); // 핑 수행
 
-                // 2. 좌석별 사용량 기록
-                seatUsageHourlyService.recordHourlyUsage(pcroomId);
+                pingService.saveUtilizationAndResults(
+                        list.getResult(),
+                        list.getPcroomId(),
+                        list.getUtilization(),
+                        list.getNow());
 
-                System.out.println("좌석 사용량 기록 완료: PC방 " + pcroomId);
+
+                log.info("좌석 사용량 기록 완료: PC방 {}", pcroomId);
             } catch (Exception e) {
-                System.err.println("좌석 사용량 기록 실패: PC방 " + pcroomId + " / " + e.getMessage());
+                log.info("좌석 사용량 기록 실패: PC방 {} / {}", pcroomId, e.getMessage());
             }
         }
     }

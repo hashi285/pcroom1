@@ -33,7 +33,6 @@ public class PcroomHourlyUtilizationBatchService {
 
             double utilization = 0;
             try {
-                utilization = pingService.ping(pcroomId); // 0~100% 값 반환
             } catch (Exception e) {
                 e.printStackTrace();
             }

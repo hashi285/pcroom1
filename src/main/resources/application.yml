@@ -13,11 +13,25 @@ spring:
       hibernate:
         dialect: org.hibernate.dialect.MySQL8Dialect
 
+  data:
+    redis:
+      host: ${SPRING_REDIS_HOST:redis}
+      port: ${SPRING_REDIS_PORT:6379}
+      timeout: 3s
+      lettuce:
+        pool:
+          max-active: 50
+          max-idle: 10
+          min-idle: 2
+
   config:
     import: optional:file:.env[.properties]
 
 jwt:
   secret: ${JWT_SECRET}
+
+file:
+  upload-dir: ${FILE_UPLOAD_DIR:C:/dev/uploads}
 
 springdoc:
   api-docs:
