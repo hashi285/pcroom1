@@ -13,7 +13,7 @@ import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSeriali
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 
 @Configuration
-//@Profile("prod")  // 홈서버에서만 활성화
+@Profile("prod")  // 홈서버에서만 활성화
 public class RedisConfig {
 
     /**
