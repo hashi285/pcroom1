@@ -12,6 +12,7 @@ import org.example.pcroom.feature.pcroom.entity.Seat;
 import org.example.pcroom.feature.pcroom.repository.IpResultRepository;
 import org.example.pcroom.feature.pcroom.repository.PcroomRepository;
 import org.example.pcroom.feature.pcroom.repository.SeatRepository;
+import org.example.pcroom.global.config.redis.PcroomSeatStatusCacheRepository;
 import org.example.pcroom.global.config.redis.PcroomStatusCacheRepository;
 import org.springframework.stereotype.Service;
 import lombok.extern.slf4j.Slf4j;
@@ -30,26 +31,22 @@ public class PcroomService {
     private final SeatRepository seatRepository;
     private final IpResultRepository ipResultRepository;
     private final PcroomStatusCacheRepository pcroomStatusCacheRepository;
+    private final PcroomSeatStatusCacheRepository pcroomSeatStatusCacheRepository;
 
 
     @Transactional(readOnly = true)
-    public PingUtilizationDto getSeatStatusFromCache(Long pcroomId) throws Exception {
+    public PingUtilizationDto getStatusFromCache(Long pcroomId) throws Exception {
 
         Pcroom pcroom = pcroomRepository.findByPcroomId(pcroomId)
                 .orElseThrow(() -> new IllegalArgumentException("Invalid PC Room ID: " + pcroomId));
 
         Integer seatCount = pcroom.getSeatCount();
 
-        log.info("[getSeatStatusFromCache] 조회 시작 - pcroomId={}, seatCount={}", pcroomId, seatCount);
-
         PingUtilizationDto.UtilizationAndResults cached = pcroomStatusCacheRepository.getPcroomStatus(pcroomId);
 
         if (cached == null) {
-            log.info("[getSeatStatusFromCache] Redis MISS → Ping 실행 - key={}", pcroomId);
             cached = pingService.ping(pcroomId);
 
-            pcroomStatusCacheRepository.savePcroomStatus(cached);
-            log.info("[getSeatStatusFromCache] Redis 저장 완료 - key={}", pcroomId);
         }
 
         int activeSeats = (int) cached.getResult().stream()
@@ -68,6 +65,18 @@ public class PcroomService {
     }
 
 
+    @Transactional(readOnly = true)
+    public List<IpResultDto.SeatStatusDto> getSeatStatusFromCache(Long pcroomId) throws Exception {
+
+        List<IpResultDto.SeatStatusDto>  seatStatusDtoList = pcroomSeatStatusCacheRepository.getPcroomStatus(pcroomId);
+
+        if (seatStatusDtoList == null) {
+            pingService.ping(pcroomId);
+        }
+
+        return seatStatusDtoList;
+
+    }
 
 
     /**

@@ -32,7 +32,7 @@ public class PcroomController {
      */
     @GetMapping("/{pcroomId}/utilization")ResponseEntity<PingUtilizationDto> getPcroomStatus(@PathVariable Long pcroomId) throws Exception {
             log.info("메서드 시각-----------------------------------------------------------");
-        return ResponseEntity.ok().body(pcroomService.getSeatStatusFromCache(pcroomId));
+        return ResponseEntity.ok().body(pcroomService.getStatusFromCache(pcroomId));
     }
 
     /**
@@ -74,8 +74,8 @@ public class PcroomController {
 
     @GetMapping("/{pcroomId}/seat")
     @Operation(summary = "피시방 좌석별 최신 상태 반환")
-    public ResponseEntity<List<IpResultDto.SeatStatusDto>> getLatestSeats(@PathVariable Long pcroomId)  {
-        List<IpResultDto.SeatStatusDto> latestSeats = pcroomService.getLatestSeatResults(pcroomId);
+    public ResponseEntity<List<IpResultDto.SeatStatusDto>> getLatestSeats(@PathVariable Long pcroomId) throws Exception {
+        List<IpResultDto.SeatStatusDto> latestSeats = pcroomService.getSeatStatusFromCache(pcroomId);
         return ResponseEntity.ok(latestSeats);
     }
 
