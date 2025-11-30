@@ -12,6 +12,8 @@ import org.example.pcroom.feature.pcroom.entity.Utilization;
 import org.example.pcroom.feature.pcroom.repository.IpResultRepository;
 import org.example.pcroom.feature.pcroom.repository.SeatRepository;
 import org.example.pcroom.feature.pcroom.repository.UtilizationRepository;
+import org.example.pcroom.global.config.redis.PcroomSeatStatusCacheRepository;
+import org.example.pcroom.global.config.redis.PcroomStatusCacheRepository;
 import org.springframework.stereotype.Service;
 
 import java.net.InetAddress;
@@ -29,6 +31,9 @@ public class PingService {
     private final UtilizationRepository utilizationRepository;
     private final SeatRepository seatRepository;
     private final IpResultRepository ipResultRepository;
+    private final PcroomStatusCacheRepository pcroomStatusCacheRepository;
+    private final PcroomSeatStatusCacheRepository  pcroomSeatStatusCacheRepository;
+
 
     /**
      * 메인 Ping 실행 메서드
@@ -57,12 +62,12 @@ public class PingService {
 
     }
 
-    /**
-     * 병렬로 Ping 수행 + 결과 수집
-     */
-    private PingUtilizationDto.UtilizationAndResults performParallelPing(List<String> ipList, Map<String, Seat> ipToSeat,
-                                       Long pcroomId, LocalDateTime now)
-            throws InterruptedException, ExecutionException {
+    private PingUtilizationDto.UtilizationAndResults performParallelPing(
+            List<String> ipList,
+            Map<String, Seat> ipToSeat,
+            Long pcroomId,
+            LocalDateTime now
+    ) throws InterruptedException, ExecutionException {
 
         ExecutorService executor = Executors.newFixedThreadPool(Math.min(ipList.size(), 50));
         List<Future<IpResult>> futures = new ArrayList<>();
@@ -90,18 +95,36 @@ public class PingService {
 
         executor.shutdown();
 
-        // 살아있는 좌석 수 계산
+        // utilization 계산
         double aliveCount = results.stream().filter(IpResult::getResult).count();
         double utilization = Math.round((aliveCount / results.size() * 100.0) * 100) / 100.0;
 
-        return new PingUtilizationDto.UtilizationAndResults(
+        // Redis 저장용 SeatStatusDto 리스트 생성
+        List<IpResultDto.SeatStatusDto> seatStatusDtoList = results.stream()
+                .map(r -> new IpResultDto.SeatStatusDto(
+                        ipToSeat.entrySet().stream()
+                                .filter(e -> e.getValue().getSeatId().equals(r.getSeatId()))
+                                .findFirst()
+                                .map(e -> e.getValue().getSeatsNum())
+                                .orElse(null),
+                        r.getResult()
+                ))
+                .toList();
 
-                results,
-                pcroomId,
-                utilization,
-                now
-        );
+        // 전체 ping + 활용도 DTO
+        PingUtilizationDto.UtilizationAndResults result =
+                new PingUtilizationDto.UtilizationAndResults(
+                        results,
+                        pcroomId,
+                        utilization,
+                        now
+                );
 
+        // Redis 저장
+        pcroomStatusCacheRepository.savePcroomStatus(result);                // 활용도 + 상세 결과
+        pcroomSeatStatusCacheRepository.savePcroomSeatStatus(pcroomId, seatStatusDtoList);  // 좌석만
+
+        return result;
     }
 
     /**
