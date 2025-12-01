@@ -35,34 +35,25 @@ public class SeatUsageHourlyService {
         List<IpResultDto.SeatStatusDto> latestResults = pingService.getLatestSeatResults(pcroomId);
 
         // Map으로 변환: seatNum -> alive 여부
-        Map<Integer, Boolean> seatAliveMap = latestResults.stream()
-                .collect(Collectors.toMap(
-                        IpResultDto.SeatStatusDto::getSeatsNum,
-                        IpResultDto.SeatStatusDto::getResult
-                ));
+        Map<Integer, Boolean> seatAliveMap = latestResults.stream().collect(Collectors.toMap(IpResultDto.SeatStatusDto::getSeatsNum, IpResultDto.SeatStatusDto::getResult));
 
         // 3. 현재 시간 30분 단위로 truncate
         LocalDateTime now = LocalDateTime.now().truncatedTo(ChronoUnit.MINUTES);
 
         // 4. DB에서 동일 시간/PC방 기록 조회
-        List<SeatUsageHourly> existingRecords =
-                seatUsageHourlyRepository.findByPcroomIdAndCreatedAt(pcroomId, now);
+        List<SeatUsageHourly> existingRecords = seatUsageHourlyRepository.findByPcroomIdAndCreatedAt(pcroomId, now);
 
-        Set<Long> existingSeatIds = existingRecords.stream()
-                .map(SeatUsageHourly::getSeatId)
-                .collect(Collectors.toSet());
+        Set<Long> existingSeatIds = existingRecords.stream().map(SeatUsageHourly::getSeatId).collect(Collectors.toSet());
 
         // 5. 신규 기록만 생성
-        List<SeatUsageHourly> hourlyList = seatAliveMap.entrySet().stream()
-                .filter(e -> !existingSeatIds.contains(Long.valueOf(e.getKey())))
-                .map(e -> {
-                    SeatUsageHourly usage = new SeatUsageHourly();
-                    usage.setPcroomId(pcroomId);
-                    usage.setSeatId(Long.valueOf(e.getKey()));
-                    usage.setCreatedAt(now);
-                    usage.setUsedSeconds(e.getValue() ? 1800 : 0); // alive → 30분
-                    return usage;
-                }).toList();
+        List<SeatUsageHourly> hourlyList = seatAliveMap.entrySet().stream().filter(e -> !existingSeatIds.contains(Long.valueOf(e.getKey()))).map(e -> {
+            SeatUsageHourly usage = new SeatUsageHourly();
+            usage.setPcroomId(pcroomId);
+            usage.setSeatId(Long.valueOf(e.getKey()));
+            usage.setCreatedAt(now);
+            usage.setUsedSeconds(e.getValue() ? 1800 : 0); // alive → 30분
+            return usage;
+        }).toList();
 
         // 6. DB 저장
         if (!hourlyList.isEmpty()) {

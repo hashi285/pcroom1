@@ -38,29 +38,15 @@ public class SeatUsageDailyService {
         if (hourlyList.isEmpty()) return;
 
         // 2. 좌석별 사용률 계산
-        Map<Long, Double> seatUsagePercent = hourlyList.stream()
-                .collect(Collectors.groupingBy(
-                        SeatUsageHourly::getSeatId,
-                        Collectors.summingInt(SeatUsageHourly::getUsedSeconds) // 초 합계
-                ))
-                .entrySet().stream()
-                .collect(Collectors.toMap(
-                        Map.Entry::getKey,
-                        e -> Math.min(100.0, e.getValue() / (double)(24 * 3600) * 100) // 하루 24시간 기준 % 계산
-                ));
+        Map<Long, Double> seatUsagePercent = hourlyList.stream().collect(Collectors.groupingBy(SeatUsageHourly::getSeatId, Collectors.summingInt(SeatUsageHourly::getUsedSeconds) // 초 합계
+        )).entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, e -> Math.min(100.0, e.getValue() / (double) (24 * 3600) * 100) // 하루 24시간 기준 % 계산
+        ));
 
         LocalDateTime now = LocalDateTime.now();
 
         // 3. SeatUsageDaily 생성
-        List<SeatUsageDaily> dailyList = seatUsagePercent.entrySet().stream()
-                .map(e -> SeatUsageDaily.builder()
-                        .pcroomId(pcroomId)
-                        .seatId(e.getKey())
-                        .date(yesterday)
-                        .usedPercent(Math.round(e.getValue() * 100.0) / 100.0) // 소수점 2자리
-                        .createdAt(now)
-                        .build()
-                ).toList();
+        List<SeatUsageDaily> dailyList = seatUsagePercent.entrySet().stream().map(e -> SeatUsageDaily.builder().pcroomId(pcroomId).seatId(e.getKey()).date(yesterday).usedPercent(Math.round(e.getValue() * 100.0) / 100.0) // 소수점 2자리
+                .createdAt(now).build()).toList();
 
         // 4. DB 저장
         dailyRepository.saveAll(dailyList);

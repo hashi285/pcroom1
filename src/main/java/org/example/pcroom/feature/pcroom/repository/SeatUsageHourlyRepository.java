@@ -19,13 +19,13 @@ public interface SeatUsageHourlyRepository extends JpaRepository<SeatUsageHourly
 
     // 특정 좌석, 피시방, 날짜, 시간대별 데이터 조회
     @Query("""
-        SELECT s 
-        FROM SeatUsageHourly s 
-        WHERE s.seatId = :seatId 
-          AND s.pcroomId = :pcroomId
-          AND FUNCTION('DATE', s.createdAt) = :date
-          AND FUNCTION('HOUR', s.createdAt) = :hour
-    """)
+                SELECT s 
+                FROM SeatUsageHourly s 
+                WHERE s.seatId = :seatId 
+                  AND s.pcroomId = :pcroomId
+                  AND FUNCTION('DATE', s.createdAt) = :date
+                  AND FUNCTION('HOUR', s.createdAt) = :hour
+            """)
     Optional<SeatUsageHourly> findBySeatIdAndPcroomIdAndDateHour(
             @Param("seatId") Long seatId,
             @Param("pcroomId") Long pcroomId,
@@ -35,30 +35,29 @@ public interface SeatUsageHourlyRepository extends JpaRepository<SeatUsageHourly
 
     // 하루 단위로 사용량 합산
     @Query("""
-        SELECT new org.example.pcroom.feature.pcroom.dto.SeatUsageDailyDTO(
-            s.seatId,
-            s.pcroomId,
-            SUM(s.usedSeconds)
-        )
-        FROM SeatUsageHourly s
-        WHERE FUNCTION('DATE', s.createdAt) = :date
-        GROUP BY s.seatId, s.pcroomId
-    """)
+                SELECT new org.example.pcroom.feature.pcroom.dto.SeatUsageDailyDTO(
+                    s.seatId,
+                    s.pcroomId,
+                    SUM(s.usedSeconds)
+                )
+                FROM SeatUsageHourly s
+                WHERE FUNCTION('DATE', s.createdAt) = :date
+                GROUP BY s.seatId, s.pcroomId
+            """)
     List<SeatUsageDailyDTO> aggregateDaily(@Param("date") LocalDate date);
 
 
     @Modifying
     @Transactional
     @Query("""
-    DELETE FROM SeatUsageHourly h
-    WHERE h.pcroomId = :pcroomId
-      AND DATE(h.createdAt) = :date
-""")
+                DELETE FROM SeatUsageHourly h
+                WHERE h.pcroomId = :pcroomId
+                  AND DATE(h.createdAt) = :date
+            """)
     void deleteByPcroomIdAndDate(
             @Param("pcroomId") Long pcroomId,
             @Param("date") LocalDate date
     );
-
 
 
     List<SeatUsageHourly> findByPcroomIdAndCreatedAt(Long pcroomId, LocalDateTime createdAt);

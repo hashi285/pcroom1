@@ -2,6 +2,7 @@ package org.example.pcroom.feature.pcroom.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+
 import java.util.Objects;
 
 /**
@@ -43,18 +44,11 @@ public class Pcroom {
     private int height;
 
 
-    public static Pcroom register(
-         String nameOfPcroom, Integer seatCount, int port, int width, int height) {
+    public static Pcroom register(String nameOfPcroom, Integer seatCount, int port, int width, int height) {
         Objects.requireNonNull(nameOfPcroom, "null 넣지마라 개쉐이야");
 
 
-        return Pcroom.builder()
-            .nameOfPcroom(nameOfPcroom)
-            .seatCount(seatCount)
-            .port(port)
-            .width(width)
-            .height(height)
-            .build();
+        return Pcroom.builder().nameOfPcroom(nameOfPcroom).seatCount(seatCount).port(port).width(width).height(height).build();
     }
 
 }

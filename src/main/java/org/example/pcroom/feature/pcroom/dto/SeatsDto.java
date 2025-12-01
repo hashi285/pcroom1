@@ -8,7 +8,7 @@ import org.example.pcroom.feature.pcroom.entity.Seat;
 
 /**
  * PC방 정보
-
+ * <p>
  * 주요 필드:
  * - zonNumber:
  */
@@ -30,6 +30,5 @@ public class SeatsDto {
         seat.setY(this.y);
         return seat;
     }
-
 }
 

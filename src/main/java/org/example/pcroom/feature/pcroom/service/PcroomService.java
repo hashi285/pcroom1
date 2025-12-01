@@ -2,6 +2,7 @@ package org.example.pcroom.feature.pcroom.service;
 
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.example.pcroom.feature.pcroom.dto.IpResultDto;
 import org.example.pcroom.feature.pcroom.dto.PcroomDto;
 import org.example.pcroom.feature.pcroom.dto.PingUtilizationDto;
@@ -15,11 +16,9 @@ import org.example.pcroom.feature.pcroom.repository.SeatRepository;
 import org.example.pcroom.global.config.redis.PcroomSeatStatusCacheRepository;
 import org.example.pcroom.global.config.redis.PcroomStatusCacheRepository;
 import org.springframework.stereotype.Service;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
-import java.util.*;
+import java.util.List;
 
 @Service
 @Slf4j
@@ -34,6 +33,10 @@ public class PcroomService {
     private final PcroomSeatStatusCacheRepository pcroomSeatStatusCacheRepository;
 
 
+    /**
+     * PC방 좌석 점유율을 조회한다.
+     * 캐시 miss 시 실제 ping 기반 검사를 수행해 최신화한다.
+     */
     @Transactional(readOnly = true)
     public PingUtilizationDto getStatusFromCache(Long pcroomId) throws Exception {
 
@@ -65,17 +68,19 @@ public class PcroomService {
     }
 
 
+    /**
+     * 피시방 좌석의 true/false값을 조회한다.
+     *
+     */
     @Transactional(readOnly = true)
     public List<IpResultDto.SeatStatusDto> getSeatStatusFromCache(Long pcroomId) throws Exception {
 
-        List<IpResultDto.SeatStatusDto>  seatStatusDtoList = pcroomSeatStatusCacheRepository.getPcroomStatus(pcroomId);
+        List<IpResultDto.SeatStatusDto> seatStatusDtoList = pcroomSeatStatusCacheRepository.getPcroomStatus(pcroomId);
 
         if (seatStatusDtoList == null) {
             pingService.ping(pcroomId);
         }
-
         return seatStatusDtoList;
-
     }
 
 
@@ -108,7 +113,7 @@ public class PcroomService {
 
     /**
      * 좌석 등록 (PC방 전체 좌석 일괄 등록 방식)
-     *
+     * <p>
      * 정책: 좌석 입력 개수 != 등록된 수량 → 예외 처리
      */
     @Transactional
@@ -175,32 +180,6 @@ public class PcroomService {
                         seat.getX(),
                         seat.getY()
                 ))
-                .toList();
-    }
-
-
-    /**
-     * 가장 최신 Ping 결과 조회
-     * Redis 캐시가 아니라 DB Persistence Layer에서 조회하는 방식
-     */
-    @Transactional
-    public List<IpResultDto.SeatStatusDto> getLatestSeatResults(Long pcroomId) {
-
-        long start = System.currentTimeMillis();
-
-        List<IpResult> latest = ipResultRepository.findLatestByPcroomIdBeforeNow(pcroomId, LocalDateTime.now());
-
-        log.info("[getLatestSeatResults] DB Latency={}ms count={}",
-                (System.currentTimeMillis() - start), latest.size());
-
-        return latest.stream()
-                .map(result -> {
-
-                    Seat seat = seatRepository.findById(result.getSeatId())
-                            .orElseThrow(() -> new EntityNotFoundException("좌석 정보 없음 seatId=" + result.getSeatId()));
-
-                    return new IpResultDto.SeatStatusDto(seat.getSeatsNum(), result.getResult());
-                })
                 .toList();
     }
 }

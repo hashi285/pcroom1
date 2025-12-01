@@ -3,14 +3,11 @@ package org.example.pcroom.feature.pcroom.service;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.example.pcroom.feature.pcroom.dto.SeatUsageDailyResponse;
-import org.example.pcroom.feature.pcroom.entity.IpResult;
-import org.example.pcroom.feature.pcroom.entity.SeatUsageHourly;
 import org.example.pcroom.feature.pcroom.repository.SeatUsageDailyRepository;
 import org.example.pcroom.feature.pcroom.repository.SeatUsageHourlyRepository;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -35,7 +32,4 @@ public class SeatUsageService {
                         .build())
                 .toList();
     }
-
-
-
 }

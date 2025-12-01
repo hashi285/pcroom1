@@ -35,7 +35,7 @@ public class PcroomStatusCacheRepository {
 
     /**
      * PC방 단위 DTO 전체 조회
-     *
+     * <p>
      * Redis에서 가져온 Object는 GenericJackson2JsonRedisSerializer 역직렬화 결과로 Map일 가능성이 크다.
      * 따라서 ObjectMapper.convertValue를 이용해 명시적으로 DTO로 변환한다.
      */
@@ -65,7 +65,7 @@ public class PcroomStatusCacheRepository {
     private String summariseForLog(Object value) {
         try {
             if (value instanceof Map) {
-                Map<?,?> m = (Map<?,?>) value;
+                Map<?, ?> m = (Map<?, ?>) value;
                 return "Map(keys=" + m.keySet().size() + ")";
             }
             return value.toString();
