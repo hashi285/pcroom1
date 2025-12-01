@@ -20,64 +20,45 @@ import java.util.List;
 @RestController
 @RequiredArgsConstructor
 @Slf4j
-@Tag(name = "앱 주요 기능 API", description = "이 앱의 주요 기능이 모여있는 API 입니다. 모든 회원이 사용합니다.")
+@Tag(name = "앱 주요 기능 API", description = "모든 회원이 사용한다.")
 
 public class PcroomController {
     private final PcroomService pcroomService;
     private final SeatUsageService seatUsageService;
 
-    /**
-     * Redis 캐시에서 피시방 좌석 상태 조회
-     * 캐시 없으면 Ping 수행 후 저장 후 반환
-     */
-    @GetMapping("/{pcroomId}/utilization")ResponseEntity<PingUtilizationDto> getPcroomStatus(@PathVariable Long pcroomId) throws Exception {
-            log.info("메서드 시각-----------------------------------------------------------");
+    @GetMapping("/{pcroomId}/utilization")
+    @Operation(summary = "피시방 가동률 반환", description = "피시방 가동률을 'double' 형태로 반환한다.")
+    public ResponseEntity<PingUtilizationDto> getPcroomStatus(@PathVariable Long pcroomId) throws Exception {
         return ResponseEntity.ok().body(pcroomService.getStatusFromCache(pcroomId));
     }
 
-    /**
-     * 피시방 검색
-     * @param name
-     * @return
-     */
     @GetMapping
     @Operation(summary = "피시방 LIKE 검색", description = "검색 단어가 들어간 피시방을 반환한다.")
-    public ResponseEntity<List<PcroomDto>> searchPcrooms(@RequestParam(required = false) String name){
-        List<PcroomDto> result = pcroomService.searchPcrooms(name);
-        return ResponseEntity.ok(result);
+    public ResponseEntity<List<PcroomDto>> searchPcrooms(@RequestParam(required = false) String name) {
+        return ResponseEntity.ok(pcroomService.searchPcrooms(name));
     }
 
     @GetMapping("/사용률/{pcroomId}")
     @Operation(summary = "자리별 사용률을 반환한다.")
-    public ResponseEntity<List<SeatUsageDailyResponse>> getSeatUsage(
-            @PathVariable Long pcroomId,
-            @RequestParam LocalDate start,
-            @RequestParam LocalDate end
-    ) {
-        List<SeatUsageDailyResponse> usageList = seatUsageService.getDailyUsage(pcroomId, start, end);
-        return ResponseEntity.ok(usageList);
+    public ResponseEntity<List<SeatUsageDailyResponse>> getSeatUsage(@PathVariable Long pcroomId, @RequestParam LocalDate start, @RequestParam LocalDate end) {
+        return ResponseEntity.ok( seatUsageService.getDailyUsage(pcroomId, start, end));
     }
 
     @GetMapping("/pcroomInfo/{pcroomId}")
     @Operation(summary = "피시방의 기본 정보를 반환합니다.")
     public ResponseEntity<PcroomDto.PcroomInfo> getPcroomInfo(@PathVariable Long pcroomId) {
-        PcroomDto.PcroomInfo pcroomInfo = pcroomService.getPcroomInfo(pcroomId);
-        return ResponseEntity.ok(pcroomInfo);
+        return ResponseEntity.ok(pcroomService.getPcroomInfo(pcroomId));
     }
 
     @GetMapping("/seatInfo/{pcroomId}")
     @Operation(summary = "피시방 좌석의 정보를 반환합니다.")
     public ResponseEntity<List<PcroomDto.seatInfo>> getSeatInfo(@PathVariable Long pcroomId) {
-        List<PcroomDto.seatInfo> seatInfoList  = pcroomService.seatInfo(pcroomId);
-        return ResponseEntity.ok(seatInfoList);
+        return ResponseEntity.ok(pcroomService.seatInfo(pcroomId));
     }
 
     @GetMapping("/{pcroomId}/seat")
     @Operation(summary = "피시방 좌석별 최신 상태 반환")
     public ResponseEntity<List<IpResultDto.SeatStatusDto>> getLatestSeats(@PathVariable Long pcroomId) throws Exception {
-        List<IpResultDto.SeatStatusDto> latestSeats = pcroomService.getSeatStatusFromCache(pcroomId);
-        return ResponseEntity.ok(latestSeats);
+        return ResponseEntity.ok(pcroomService.getSeatStatusFromCache(pcroomId));
     }
-
-
 }

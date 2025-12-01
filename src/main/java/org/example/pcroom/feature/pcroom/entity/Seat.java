@@ -1,11 +1,14 @@
 package org.example.pcroom.feature.pcroom.entity;
 
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 /**
  * PC방 자리 정보
-
+ * <p>
  * 주요 필드:
  * - seatId: PK, 자동 생성
  * - pcroomId: pcroomId FK

@@ -13,6 +13,7 @@ import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
 import java.util.List;
+
 @Component
 @RequiredArgsConstructor
 @Slf4j
@@ -43,7 +44,6 @@ public class PingScheduler {
                         list.getPcroomId(),
                         list.getUtilization(),
                         list.getNow());
-
 
                 log.info("좌석 사용량 기록 완료: PC방 {}", pcroomId);
             } catch (Exception e) {

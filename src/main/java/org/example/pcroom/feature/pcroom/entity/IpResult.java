@@ -9,7 +9,7 @@ import java.time.LocalDateTime;
 
 /**
  * ip 검색 결과
-
+ * <p>
  * 주요 필드:
  * - resultId: PK, 자동 생성
  * - pcroomId: pcroomId FK

@@ -18,8 +18,13 @@ import org.springframework.stereotype.Service;
 
 import java.net.InetAddress;
 import java.time.LocalDateTime;
-import java.util.*;
-import java.util.concurrent.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -32,7 +37,7 @@ public class PingService {
     private final SeatRepository seatRepository;
     private final IpResultRepository ipResultRepository;
     private final PcroomStatusCacheRepository pcroomStatusCacheRepository;
-    private final PcroomSeatStatusCacheRepository  pcroomSeatStatusCacheRepository;
+    private final PcroomSeatStatusCacheRepository pcroomSeatStatusCacheRepository;
 
 
     /**
@@ -44,21 +49,21 @@ public class PingService {
         LocalDateTime now = LocalDateTime.now();
 
         // 1분 이상 지난 경우만 Ping 수행
-            List<Seat> seats = seatRepository.findByPcroomId(pcroomId);
+        List<Seat> seats = seatRepository.findByPcroomId(pcroomId);
 
-            // 좌석 IP 리스트
-            List<String> ipList = seats.stream()
-                    .map(Seat::getSeatsIp)
-                    .toList();
+        // 좌석 IP 리스트
+        List<String> ipList = seats.stream()
+                .map(Seat::getSeatsIp)
+                .toList();
 
-            // IP → Seat 매핑
-            Map<String, Seat> ipToSeat = seats.stream()
-                    .collect(Collectors.toMap(Seat::getSeatsIp, Function.identity()));
+        // IP → Seat 매핑
+        Map<String, Seat> ipToSeat = seats.stream()
+                .collect(Collectors.toMap(Seat::getSeatsIp, Function.identity()));
 
-            log.info("ping 작업 시작");
+        log.info("ping 작업 시작");
 
 
-            return performParallelPing(ipList, ipToSeat, pcroomId, now);
+        return performParallelPing(ipList, ipToSeat, pcroomId, now);
 
     }
 
@@ -139,8 +144,6 @@ public class PingService {
     }
 
 
-
-
     @Transactional
     public List<IpResultDto.SeatStatusDto> getLatestSeatResults(Long pcroomId) {
         List<IpResult> latestSeats = ipResultRepository.findLatestByPcroomIdBeforeNow(pcroomId, LocalDateTime.now());
@@ -159,9 +162,9 @@ public class PingService {
 
     /**
      *
-     * @param results List(seatId, seatNum, isAlive)
+     * @param results  List(seatId, seatNum, isAlive)
      * @param pcroomId 피시방 Id
-     * @param now 현재 시각
+     * @param now      현재 시각
      * @return 가동률
      */
 
