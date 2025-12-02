@@ -30,14 +30,11 @@ public class PcroomSeatStatusCacheRepository {
         redisTemplate.opsForValue().set(key, dto, Duration.ofMinutes(2));
         // 저장 직후에는 디버그 용으로 key 존재 확인만 한다 (값 형식은 Map 일 수 있음)
         Object check = redisTemplate.opsForValue().get(key);
-        log.info("[savePcroomStatus] Redis 저장 후 조회 타입: {}, valueSummary: {}",
-                check == null ? "null" : check.getClass().getSimpleName(),
-                check == null ? "null" : summariseForLog(check));
+        log.info("[savePcroomStatus] Redis 저장 후 조회 타입: {}, valueSummary: {}", check == null ? "null" : check.getClass().getSimpleName(), check == null ? "null" : summariseForLog(check));
     }
 
     /**
      * PC방 단위 좌석 상태 조회
-     *
      * Redis에서 꺼낸 값(Map, List 등)을 SeatStatusDto 리스트로 변환
      */
     public List<IpResultDto.SeatStatusDto> getPcroomStatus(Long pcroomId) {
@@ -51,17 +48,15 @@ public class PcroomSeatStatusCacheRepository {
 
         try {
             // Redis 반환값 → SeatStatusDto 리스트로 변환
-            List<IpResultDto.SeatStatusDto> dtoList =
-                    objectMapper.convertValue(raw, new TypeReference<List<IpResultDto.SeatStatusDto>>() {});
+            List<IpResultDto.SeatStatusDto> dtoList = objectMapper.convertValue(raw, new TypeReference<List<IpResultDto.SeatStatusDto>>() {
+            });
 
-            log.info("[getPcroomStatus] HIT – key={}, size={}", key,
-                    dtoList == null ? 0 : dtoList.size());
+            log.info("[getPcroomStatus] HIT – key={}, size={}", key, dtoList == null ? 0 : dtoList.size());
 
             return dtoList;
 
         } catch (Exception e) {
-            log.warn("[getPcroomStatus] convertValue failed – key={}, storedClass={}, msg={}",
-                    key, raw.getClass().getName(), e.getMessage());
+            log.warn("[getPcroomStatus] convertValue failed – key={}, storedClass={}, msg={}", key, raw.getClass().getName(), e.getMessage());
             return null;
         }
     }
@@ -70,7 +65,7 @@ public class PcroomSeatStatusCacheRepository {
     private String summariseForLog(Object value) {
         try {
             if (value instanceof Map) {
-                Map<?,?> m = (Map<?,?>) value;
+                Map<?, ?> m = (Map<?, ?>) value;
                 return "Map(keys=" + m.keySet().size() + ")";
             }
             return value.toString();
