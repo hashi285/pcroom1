@@ -7,8 +7,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 @SpringBootApplication
 @EnableScheduling
 public class PcroomApplication {
-
-        public static void main(String[] args) {
-            SpringApplication.run(PcroomApplication.class, args);
-        }
+    public static void main(String[] args) {
+        SpringApplication.run(PcroomApplication.class, args);
     }
+}

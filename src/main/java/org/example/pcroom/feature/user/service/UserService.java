@@ -1,23 +1,24 @@
 package org.example.pcroom.feature.user.service;
 
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.example.pcroom.feature.pcroom.entity.Pcroom;
 import org.example.pcroom.feature.pcroom.entity.Seat;
 import org.example.pcroom.feature.pcroom.repository.PcroomRepository;
 import org.example.pcroom.feature.pcroom.repository.SeatRepository;
 import org.example.pcroom.feature.pcroom.service.PingService;
-import org.example.pcroom.feature.user.enums.UserRole;
 import org.example.pcroom.feature.user.dto.FavoriteDto;
 import org.example.pcroom.feature.user.dto.SignupRequest;
 import org.example.pcroom.feature.user.dto.SignupResponse;
 import org.example.pcroom.feature.user.entity.Favorite;
 import org.example.pcroom.feature.user.entity.User;
+import org.example.pcroom.feature.user.enums.UserRole;
 import org.example.pcroom.feature.user.repository.FavoriteRepository;
 import org.example.pcroom.feature.user.repository.UserRepository;
 import org.example.pcroom.global.config.security.JwtUtil;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.function.Function;
@@ -35,7 +36,10 @@ public class UserService {
     private final PingService pingService;
     private final SeatRepository seatRepository;
 
-
+    /**
+     * 로그인
+     */
+    @Transactional
     public SignupResponse signup(SignupRequest request) {
         if (userRepository.existsByEmail(request.getEmail())) {
             throw new IllegalArgumentException("이미 존재하는 이메일입니다.");
@@ -52,15 +56,14 @@ public class UserService {
         return new SignupResponse(user.getEmail(), "회원가입 성공");
     }
 
-    public UserRole userRole(Long userId){
+    @Transactional(readOnly = true)
+    public UserRole userRole(Long userId) {
         User user = userRepository.findById(userId).orElse(null);
         return user.getRole();
     }
 
     /**
      * 즐겨찾기 추가
-     * @param userId
-     * @param pcroomId
      */
     @Transactional
     public void addFavorite(Long userId, Long pcroomId) {
@@ -71,8 +74,6 @@ public class UserService {
 
     /**
      * 즐겨찾기 삭제
-     * @param userId
-     * @param itemId
      */
     @Transactional
     public void removeFavorite(Long userId, Long itemId) {
@@ -80,44 +81,23 @@ public class UserService {
     }
 
     /**
-     * 즐겨찾기한 피시방 조회
-     * @param userId
-     * @return
+     * 즐겨찾기 조회
      */
-    @Transactional
+    @Transactional(readOnly = true)
     public List<FavoriteDto> isFavorite(Long userId) {
         return favoriteRepository.findFavoritePcroomsByUserId(userId);
-    }
-
-
-    private boolean hasContinuousSeats(Long pcroomId, int partySize) {
-        if (pcroomId == null) return false;
-
-        // 좌석 조회
-        List<Seat> seats = seatRepository.findAvailableSeatsByPcroomId(pcroomId);
-        if (seats == null || seats.isEmpty()) return false;
-
-        // BFS 기반 인접 그룹 탐색
-        List<List<Seat>> groups = findAdjacentGroups(seats);
-
-        // 그룹 크기 체크
-        return groups.stream().anyMatch(group -> group.size() >= partySize);
     }
 
     private List<List<Seat>> findAdjacentGroups(List<Seat> seats) {
         if (seats == null || seats.isEmpty()) return Collections.emptyList();
 
         // 좌표를 key로 매핑
-        Map<String, Seat> seatMap = seats.stream()
-                .collect(Collectors.toMap(
-                        s -> s.getX() + "," + s.getY(),
-                        Function.identity(),
-                        (a, b) -> a // 중복 좌표 시 첫 번째만 사용
-                ));
+        Map<String, Seat> seatMap = seats.stream().collect(Collectors.toMap(s -> s.getX() + "," + s.getY(), Function.identity(), (a, b) -> a // 중복 좌표 시 첫 번째만 사용
+        ));
 
         Set<String> visited = new HashSet<>();
         List<List<Seat>> groups = new ArrayList<>();
-        int[][] directions = {{1,0},{-1,0},{0,1},{0,-1}}; // 상하좌우
+        int[][] directions = {{1, 0}, {-1, 0}, {0, 1}, {0, -1}}; // 상하좌우
 
         for (Seat seat : seats) {
             if (seat == null) continue;
@@ -152,14 +132,10 @@ public class UserService {
                     }
                 }
             }
-
             if (!group.isEmpty()) groups.add(group);
         }
-
         return groups;
     }
-
-
 
 
     @Transactional
@@ -168,35 +144,36 @@ public class UserService {
         // 기본 즐겨찾기 목록 조회
         List<FavoriteDto> favorites = isFavorite(userId);
 
-        System.out.println("userId: " + userId);
-        System.out.println("partySize: " + partySize);
-        System.out.println("favorites: " + favorites);
-
 
         // partySize == 1 이면 전체 반환
         if (partySize == 1) {
-            System.out.println(favorites);
             return favorites;
         }
 
         // 2인 이상 → 연속 좌석 조건 필터링
-        List<Long> pcroomIds = favorites.stream()
-                .map(FavoriteDto::getPcroomId)
-                .toList();
+        List<Long> pcroomIds = favorites.stream().map(FavoriteDto::getPcroomId).toList();
 
         List<Pcroom> pcrooms = pcroomRepository.findAllByPcroomIdIn(pcroomIds);
 
         // 조건 만족하는 피시방만 필터링
-        List<Long> filteredIds = pcrooms.stream()
-                .filter(pcroom -> hasContinuousSeats(pcroom.getPcroomId(), partySize))
-                .map(Pcroom::getPcroomId)
-                .toList();
+        List<Long> filteredIds = pcrooms.stream().filter(pcroom -> hasContinuousSeats(pcroom.getPcroomId(), partySize)).map(Pcroom::getPcroomId).toList();
 
         // FavoriteDto 목록에서 필터링된 id만 남기기
-        return favorites.stream()
-                .filter(dto -> filteredIds.contains(dto.getPcroomId()))
-                .toList();
+        return favorites.stream().filter(dto -> filteredIds.contains(dto.getPcroomId())).toList();
     }
 
 
+    private boolean hasContinuousSeats(Long pcroomId, int partySize) {
+        if (pcroomId == null) return false;
+
+        // 좌석 조회
+        List<Seat> seats = seatRepository.findAvailableSeatsByPcroomId(pcroomId);
+        if (seats == null || seats.isEmpty()) return false;
+
+        // BFS 기반 인접 그룹 탐색
+        List<List<Seat>> groups = findAdjacentGroups(seats);
+
+        // 그룹 크기 체크
+        return groups.stream().anyMatch(group -> group.size() >= partySize);
+    }
 }

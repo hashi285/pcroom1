@@ -6,7 +6,5 @@ package org.example.pcroom.feature.user.enums;
  * - ADMIN: 앱 관리자
  */
 public enum UserRole {
-    USER,
-    OWNER,
-    ADMIN
+    USER, OWNER, ADMIN
 }
