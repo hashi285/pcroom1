@@ -53,8 +53,6 @@ public class ManagerService {
         competitorRelationRepository.deletePcroomManagerByUserIdAndPcroomId(userId, pcroomId);
     }
 
-
-
     // 경쟁 피시방 조회
     @Transactional
     public List<ManagerPcroomDto.PcroomManager> findPcroom(Long userId) {
@@ -106,7 +104,6 @@ public class ManagerService {
                 })
                 .toList();
     }
-
 
     // 사용자가 운영중인 피시방을 보여준다.
     @Transactional

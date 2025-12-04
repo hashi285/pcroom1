@@ -10,5 +10,6 @@ import java.util.Optional;
 @Repository
 public interface NoticeRepository extends JpaRepository<Notice,Long> {
     List<Notice> findNoticesByPcroomId(Long pcroomId);
+
     Optional<Notice> findNoticeById(Long id);
 }
