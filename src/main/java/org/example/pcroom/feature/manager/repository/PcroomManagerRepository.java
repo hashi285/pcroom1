@@ -9,7 +9,6 @@ import java.util.List;
 @Repository
 public interface PcroomManagerRepository extends JpaRepository<PcroomManager,Long> {
     List<PcroomManager> findAllByUserId(Long userId);
+
     void deleteByUserIdAndPcroomId(Long userId, Long pcroomId);
-
-
 }

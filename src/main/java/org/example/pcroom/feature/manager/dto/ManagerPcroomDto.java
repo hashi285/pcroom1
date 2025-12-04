@@ -15,7 +15,6 @@ public class ManagerPcroomDto {
     @AllArgsConstructor
     public static class addPcroomResponse{
         private Long userId;
-
         private Long pcroomId;
     }
 
@@ -23,7 +22,6 @@ public class ManagerPcroomDto {
     @AllArgsConstructor
     public static class removeManagerFromPcroom{
         private Long userId;
-
         private Long pcroomId;
     }
 
@@ -31,11 +29,8 @@ public class ManagerPcroomDto {
     @AllArgsConstructor
     public static class FindByManagerId{
         private Long pcroomId;
-
         private String nameOfPcroom;
-
         private double utilization;
-
         private LocalDateTime time;
 
     }

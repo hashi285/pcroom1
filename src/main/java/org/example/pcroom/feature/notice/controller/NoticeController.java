@@ -33,5 +33,4 @@ public class NoticeController {
         NoticeDto.NoticeDetailDto noticeDetailDto = noticeService.findNoticeDetail(noticeId);
         return ResponseEntity.ok(noticeDetailDto);
     }
-
 }
