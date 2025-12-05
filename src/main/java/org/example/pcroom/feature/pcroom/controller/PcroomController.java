@@ -41,7 +41,7 @@ public class PcroomController {
     @GetMapping("/사용률/{pcroomId}")
     @Operation(summary = "자리별 사용률을 반환한다.")
     public ResponseEntity<List<SeatUsageDailyResponse>> getSeatUsage(@PathVariable Long pcroomId, @RequestParam LocalDate start, @RequestParam LocalDate end) {
-        return ResponseEntity.ok( seatUsageService.getDailyUsage(pcroomId, start, end));
+        return ResponseEntity.ok(seatUsageService.getDailyUsage(pcroomId, start, end));
     }
 
     @GetMapping("/pcroomInfo/{pcroomId}")
