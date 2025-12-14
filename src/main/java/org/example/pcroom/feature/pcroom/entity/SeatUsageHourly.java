@@ -16,8 +16,16 @@ public class SeatUsageHourly {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @Column(nullable = false)
     private Long seatId; //좌석 번호
+
+    @Column(nullable = false)
     private Long pcroomId; // 피시방 번호
+
+    @Column(nullable = false)
     private int usedSeconds;
+
+    @Column(nullable = false)
     private LocalDateTime createdAt;
 }
