@@ -19,9 +19,19 @@ public class SeatUsageDaily {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @Column(nullable = false)
     private Long seatId;
+
+    @Column(nullable = false)
     private Long pcroomId;
+
+    @Column(nullable = false)
     private LocalDate date;
+
+    @Column(nullable = false)
     private double usedPercent;
+
+    @Column(nullable = false)
     private LocalDateTime createdAt;
 }

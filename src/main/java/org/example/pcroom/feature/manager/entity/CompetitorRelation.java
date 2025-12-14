@@ -16,9 +16,9 @@ public class CompetitorRelation {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column
+    @Column(nullable = false)
     private Long userId;
 
-    @Column
+    @Column(nullable = false)
     private Long pcroomId;
 }
