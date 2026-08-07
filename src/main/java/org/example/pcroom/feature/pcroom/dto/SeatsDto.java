@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.Setter;
 import org.example.pcroom.feature.pcroom.entity.Pcroom;
 import org.example.pcroom.feature.pcroom.entity.Seat;
+import org.example.pcroom.feature.pcroom.enums.SeatType;
 
 /**
  * PC방 정보
@@ -20,6 +21,7 @@ public class SeatsDto {
     private String seatIp;
     private int x;
     private int y;
+    private String seatType = "NORMAL";
 
     public Seat toEntity(Pcroom pcroom) {
         Seat seat = new Seat();
@@ -28,6 +30,11 @@ public class SeatsDto {
         seat.setSeatsIp(this.seatIp);
         seat.setX(this.x);
         seat.setY(this.y);
+        if (this.seatType != null) {
+            seat.setSeatType(SeatType.valueOf(this.seatType));
+        } else {
+            seat.setSeatType(SeatType.NORMAL);
+        }
         return seat;
     }
 }

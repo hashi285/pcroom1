@@ -5,6 +5,8 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.example.pcroom.feature.pcroom.enums.SeatType;
+import lombok.Setter;
 
 /**
  * PC방 자리 정보
@@ -43,4 +45,8 @@ public class Seat {
 
     @Column(nullable = false)
     private int y;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "seat_type", nullable = false)
+    private SeatType seatType = SeatType.NORMAL;
 }

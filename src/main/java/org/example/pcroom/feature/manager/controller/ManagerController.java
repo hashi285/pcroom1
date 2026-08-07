@@ -58,4 +58,11 @@ public class ManagerController {
         managerService.deleteManagerFromPcroom(userId, pcroomId);
         return ResponseEntity.ok().build();
     }
+
+    @PostMapping("/pcrooms/{pcroomId}/structures")
+    @Operation(summary = "피시방 구조물 등록", description = "피시방의 화장실, 벽 등 구조물을 등록합니다.")
+    public ResponseEntity<Void> registerStructures(@PathVariable Long pcroomId, @RequestBody List<org.example.pcroom.feature.pcroom.dto.StructureDto> structures) {
+        pcRoomService.saveStructures(pcroomId, structures);
+        return ResponseEntity.ok().build();
+    }
 }

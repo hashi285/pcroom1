@@ -39,26 +39,38 @@ public class PingService {
     private final PcroomStatusCacheRepository pcroomStatusCacheRepository;
     private final PcroomSeatStatusCacheRepository pcroomSeatStatusCacheRepository;
 
+    // isReachable()의 네이티브 블로킹으로 인한 Carrier Thread Pinning 방지용 캐시드 풀
+    private final ExecutorService pingExecutor = Executors.newCachedThreadPool();
 
     /**
      * 메인 Ping 실행 메서드
      */
-    @Transactional
     public PingUtilizationDto.UtilizationAndResults ping(Long pcroomId) throws ExecutionException, InterruptedException {
 
         LocalDateTime now = LocalDateTime.now();
 
-        // 1분 이상 지난 경우만 Ping 수행
         List<Seat> seats = seatRepository.findByPcroomId(pcroomId);
+        
+        if (seats.isEmpty()) {
+            PingUtilizationDto.UtilizationAndResults emptyResult = new PingUtilizationDto.UtilizationAndResults(
+                    new ArrayList<>(),
+                    pcroomId,
+                    0.0,
+                    now
+            );
+            pcroomStatusCacheRepository.savePcroomStatus(emptyResult);
+            pcroomSeatStatusCacheRepository.savePcroomSeatStatus(pcroomId, new ArrayList<>());
+            return emptyResult;
+        }
 
         // 좌석 IP 리스트
         List<String> ipList = seats.stream()
                 .map(Seat::getSeatsIp)
                 .toList();
 
-        // IP → Seat 매핑
+        // IP → Seat 매핑 (중복 IP가 있을 경우 기존 것 유지)
         Map<String, Seat> ipToSeat = seats.stream()
-                .collect(Collectors.toMap(Seat::getSeatsIp, Function.identity()));
+                .collect(Collectors.toMap(Seat::getSeatsIp, Function.identity(), (existing, replacement) -> existing));
 
         log.info("ping 작업 시작");
 
@@ -74,11 +86,12 @@ public class PingService {
             LocalDateTime now
     ) throws InterruptedException, ExecutionException {
 
-        ExecutorService executor = Executors.newFixedThreadPool(Math.min(ipList.size(), 50));
         List<Future<IpResult>> futures = new ArrayList<>();
+        List<IpResult> results = new ArrayList<>();
 
+        // 가상 스레드의 OS 네이티브 핀닝(Pinning) 문제로 인해 OS 스레드 풀(CachedThreadPool) 사용
         for (String ip : ipList) {
-            futures.add(executor.submit(() -> {
+            futures.add(pingExecutor.submit(() -> {
                 boolean isAlive = ping(ip);
                 Seat seat = ipToSeat.get(ip);
                 if (seat == null) return null;
@@ -91,14 +104,11 @@ public class PingService {
             }));
         }
 
-        // Future 결과 수집
-        List<IpResult> results = new ArrayList<>();
+        // Future 결과 수집 (모든 핑 완료 대기, 최대 2초)
         for (Future<IpResult> f : futures) {
             IpResult res = f.get();
             if (res != null) results.add(res);
         }
-
-        executor.shutdown();
 
         // utilization 계산
         double aliveCount = results.stream().filter(IpResult::getResult).count();
@@ -148,13 +158,18 @@ public class PingService {
     public List<IpResultDto.SeatStatusDto> getLatestSeatResults(Long pcroomId) {
         List<IpResult> latestSeats = ipResultRepository.findLatestByPcroomIdBeforeNow(pcroomId, LocalDateTime.now());
 
+        // N+1 문제 해결: 전체 좌석을 한 번에 조회 후 매핑
+        List<Seat> pcroomSeats = seatRepository.findByPcroomId(pcroomId);
+        Map<Long, Integer> seatNumMap = pcroomSeats.stream()
+                .collect(Collectors.toMap(Seat::getSeatId, Seat::getSeatsNum));
+
         return latestSeats.stream()
                 .map(ipResult -> {
-                    Seat seat = seatRepository.findById(ipResult.getSeatId())
-                            .orElseThrow(() -> new EntityNotFoundException(
-                                    "좌석 정보를 찾을 수 없습니다. seatId=" + ipResult.getSeatId()));
-
-                    return new IpResultDto.SeatStatusDto(seat.getSeatsNum(), ipResult.getResult());
+                    Integer seatNum = seatNumMap.get(ipResult.getSeatId());
+                    if (seatNum == null) {
+                        throw new EntityNotFoundException("좌석 정보를 찾을 수 없습니다. seatId=" + ipResult.getSeatId());
+                    }
+                    return new IpResultDto.SeatStatusDto(seatNum, ipResult.getResult());
                 })
                 .toList();
     }
@@ -180,11 +195,11 @@ public class PingService {
         utilizationRepository.save(utilization);
         Long utilizationId = utilization.getUtilizationId();
 
-
         for (IpResult r : results) {
-            // IpResult에 utilizationId 주입 후 저장
             r.setUtilizationId(utilizationId);
-            ipResultRepository.save(r);
         }
+        
+        // Batch Insert 적용
+        ipResultRepository.saveAll(results);
     }
 }

@@ -9,10 +9,13 @@ import org.example.pcroom.feature.pcroom.dto.PingUtilizationDto;
 import org.example.pcroom.feature.pcroom.dto.SeatsDto;
 import org.example.pcroom.feature.pcroom.entity.IpResult;
 import org.example.pcroom.feature.pcroom.entity.Pcroom;
+import org.example.pcroom.feature.pcroom.entity.PcroomStructure;
+import org.example.pcroom.feature.pcroom.dto.StructureDto;
 import org.example.pcroom.feature.pcroom.entity.Seat;
 import org.example.pcroom.feature.pcroom.repository.IpResultRepository;
 import org.example.pcroom.feature.pcroom.repository.PcroomRepository;
 import org.example.pcroom.feature.pcroom.repository.SeatRepository;
+import org.example.pcroom.feature.pcroom.repository.PcroomStructureRepository;
 import org.example.pcroom.global.config.redis.PcroomSeatStatusCacheRepository;
 import org.example.pcroom.global.config.redis.PcroomStatusCacheRepository;
 import org.springframework.stereotype.Service;
@@ -31,6 +34,7 @@ public class PcroomService {
     private final IpResultRepository ipResultRepository;
     private final PcroomStatusCacheRepository pcroomStatusCacheRepository;
     private final PcroomSeatStatusCacheRepository pcroomSeatStatusCacheRepository;
+    private final PcroomStructureRepository pcroomStructureRepository;
 
 
     /**
@@ -79,6 +83,7 @@ public class PcroomService {
 
         if (seatStatusDtoList == null) {
             pingService.ping(pcroomId);
+            seatStatusDtoList = pcroomSeatStatusCacheRepository.getPcroomStatus(pcroomId);
         }
         return seatStatusDtoList;
     }
@@ -178,8 +183,34 @@ public class PcroomService {
                         pcroomId,
                         seat.getSeatsNum(),
                         seat.getX(),
-                        seat.getY()
+                        seat.getY(),
+                        seat.getSeatType()
                 ))
                 .toList();
+    }
+
+    @Transactional
+    public void saveStructures(Long pcroomId, List<StructureDto> dtos) {
+        Pcroom pcroom = pcroomRepository.findById(pcroomId)
+                .orElseThrow(() -> new IllegalArgumentException("해당 피시방 없음: " + pcroomId));
+        
+        pcroomStructureRepository.deleteAllByPcroomId(pcroomId);
+        List<PcroomStructure> structures = dtos.stream()
+                .map(dto -> dto.toEntity(pcroom))
+                .toList();
+        pcroomStructureRepository.saveAll(structures);
+    }
+
+    @Transactional(readOnly = true)
+    public List<StructureDto> getStructures(Long pcroomId) {
+        return pcroomStructureRepository.findAllByPcroomId(pcroomId).stream()
+                .map(s -> new StructureDto(
+                        null,
+                        s.getType(),
+                        s.getX(),
+                        s.getY(),
+                        s.getWidth(),
+                        s.getHeight()
+                )).toList();
     }
 }

@@ -61,4 +61,10 @@ public class PcroomController {
     public ResponseEntity<List<IpResultDto.SeatStatusDto>> getLatestSeats(@PathVariable Long pcroomId) throws Exception {
         return ResponseEntity.ok(pcroomService.getSeatStatusFromCache(pcroomId));
     }
+
+    @GetMapping("/{pcroomId}/structures")
+    @Operation(summary = "피시방 구조물 정보 반환")
+    public ResponseEntity<List<org.example.pcroom.feature.pcroom.dto.StructureDto>> getStructures(@PathVariable Long pcroomId) {
+        return ResponseEntity.ok(pcroomService.getStructures(pcroomId));
+    }
 }
