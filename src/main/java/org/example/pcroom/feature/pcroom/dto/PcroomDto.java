@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import org.example.pcroom.feature.pcroom.entity.Pcroom;
+import org.example.pcroom.feature.pcroom.enums.SeatType;
 
 @Getter
 @Setter
@@ -52,6 +53,7 @@ public class PcroomDto {
         private final Integer seatsNum;
         private final int x;
         private final int y;
+        private final SeatType seatType;
     }
 
     @Getter
