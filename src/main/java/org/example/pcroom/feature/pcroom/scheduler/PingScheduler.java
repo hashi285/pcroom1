@@ -70,7 +70,7 @@ public class PingScheduler {
             // 2. 집계 완료 후 hourly 데이터 삭제
             seatUsageHourlyRepository.deleteByPcroomIdAndDate(pcroomId, targetDate);
 
-            System.out.println("Daily 집계 및 hourly 삭제 완료: " + pcroomId + " / " + targetDate);
+            log.info("Daily 집계 및 hourly 삭제 완료: {} / {}", pcroomId, targetDate);
         }
     }
 

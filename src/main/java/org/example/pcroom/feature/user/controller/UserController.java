@@ -21,11 +21,14 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import lombok.extern.slf4j.Slf4j;
+
 import java.util.Map;
 
 @RestController
 @RequestMapping("api")
 @RequiredArgsConstructor
+@Slf4j
 @Tag(name = "일반유저 로그인 및 회원가입 API", description = "로그인 및 회원가입 기능입니다.")
 public class UserController {
 
@@ -49,7 +52,7 @@ public class UserController {
             UserRole role = userService.userRole(userId);
 
             String jwt = jwtUtil.generateToken(userId, userDetails.getUsername(), role);
-            System.out.println("로그인 성공");
+            log.info("로그인 성공: {}", request.getEmail());
             return ResponseEntity.ok(Map.of("token", jwt));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("로그인 실패: " + e.getMessage());
