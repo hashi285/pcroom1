@@ -26,6 +26,7 @@ dependencies {
     // == Web Layer ==
     implementation 'org.springframework.boot:spring-boot-starter-web'                 // Spring MVC
     implementation 'org.springframework.boot:spring-boot-starter-web-services'        // Web Services (SOAP 등)
+    implementation 'org.springframework.boot:spring-boot-starter-validation'          // Validation
 
     // == DevTools ==
     developmentOnly 'org.springframework.boot:spring-boot-devtools'                   // 핫 리로딩 등 개발 편의 기능

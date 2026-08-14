@@ -12,7 +12,11 @@ import org.example.pcroom.global.config.security.CustomUserDetails;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import jakarta.validation.Valid;
+import org.example.pcroom.feature.pcroom.dto.StructureDto;
+import jakarta.validation.Valid;
 
 import java.util.List;
 
@@ -21,6 +25,7 @@ import java.util.List;
 @RequiredArgsConstructor
 @Tag(name = "피시방 매니저 API", description = "피시방 매니저가 사용합니다.")
 @PreAuthorize("hasAnyRole('OWNER', 'ADMIN')")
+@Validated
 public class ManagerController {
 
     private final PcroomService pcRoomService;
@@ -28,13 +33,13 @@ public class ManagerController {
 
     @PostMapping("/pcrooms")
     @Operation(summary = "피시방 등록", description = "피시방을 등록합니다.")
-    public ResponseEntity<PcroomDto.ReadPcRoomResponse> createPcroom(@RequestBody PcroomDto.CreatePcRoomRequest request) {
+    public ResponseEntity<PcroomDto.ReadPcRoomResponse> createPcroom(@Valid @RequestBody PcroomDto.CreatePcRoomRequest request) {
         return ResponseEntity.ok(pcRoomService.registerNewPcroom(request));
     }
 
     @PostMapping("/pcrooms/seats")
     @Operation(summary = "피시방 좌석 등록", description = "피시방 등록 이후 좌석을 등록합니다.")
-    public ResponseEntity<List<SeatsDto>> registerSeats(Authentication authentication, @RequestBody List<SeatsDto> seatsDtos) {
+    public ResponseEntity<List<SeatsDto>> registerSeats(Authentication authentication, @RequestBody List<@Valid SeatsDto> seatsDtos) {
         Long userId = ((CustomUserDetails) authentication.getPrincipal()).getUserId();
         return ResponseEntity.ok(pcRoomService.registerNewSeat(userId, seatsDtos));
     }
@@ -64,7 +69,7 @@ public class ManagerController {
 
     @PostMapping("/pcrooms/{pcroomId}/structures")
     @Operation(summary = "피시방 구조물 등록", description = "피시방의 화장실, 벽 등 구조물을 등록합니다.")
-    public ResponseEntity<Void> registerStructures(Authentication authentication, @PathVariable Long pcroomId, @RequestBody List<org.example.pcroom.feature.pcroom.dto.StructureDto> structures) {
+    public ResponseEntity<Void> registerStructures(Authentication authentication, @PathVariable Long pcroomId, @RequestBody List<@Valid StructureDto> structures) {
         Long userId = ((CustomUserDetails) authentication.getPrincipal()).getUserId();
         pcRoomService.saveStructures(userId, pcroomId, structures);
         return ResponseEntity.ok().build();
