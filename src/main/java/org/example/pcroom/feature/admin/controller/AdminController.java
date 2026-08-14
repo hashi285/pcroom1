@@ -7,6 +7,7 @@ import org.example.pcroom.feature.admin.dto.PcroomListDto;
 import org.example.pcroom.feature.admin.dto.UserListDto;
 import org.example.pcroom.feature.admin.service.AdminService;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
@@ -17,7 +18,8 @@ import java.util.List;
 @RestController
 @RequestMapping("api/admin")
 @RequiredArgsConstructor
-@Tag(name = "관리자 API", description = "앱 관리자만 사용합니다.")
+@Tag(name = "앱 총괄 관리자 API", description = "앱의 총 관리자가 사용한다.")
+@PreAuthorize("hasRole('ADMIN')")
 public class AdminController {
     private final AdminService adminService;
 

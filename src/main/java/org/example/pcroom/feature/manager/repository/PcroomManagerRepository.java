@@ -11,4 +11,6 @@ public interface PcroomManagerRepository extends JpaRepository<PcroomManager,Lon
     List<PcroomManager> findAllByUserId(Long userId);
 
     void deleteByUserIdAndPcroomId(Long userId, Long pcroomId);
+
+    boolean existsByUserIdAndPcroomId(Long userId, Long pcroomId);
 }

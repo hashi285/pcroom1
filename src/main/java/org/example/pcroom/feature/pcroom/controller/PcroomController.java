@@ -10,8 +10,10 @@ import org.example.pcroom.feature.pcroom.dto.PingUtilizationDto;
 import org.example.pcroom.feature.pcroom.dto.SeatUsageDailyResponse;
 import org.example.pcroom.feature.pcroom.service.PcroomService;
 import org.example.pcroom.feature.pcroom.service.SeatUsageService;
+import org.example.pcroom.feature.pcroom.service.AiService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -25,6 +27,7 @@ import java.util.List;
 public class PcroomController {
     private final PcroomService pcroomService;
     private final SeatUsageService seatUsageService;
+    private final AiService aiService;
 
     @GetMapping("/{pcroomId}/utilization")
     @Operation(summary = "피시방 가동률 반환", description = "피시방 가동률을 'double' 형태로 반환한다.")
@@ -66,5 +69,11 @@ public class PcroomController {
     @Operation(summary = "피시방 구조물 정보 반환")
     public ResponseEntity<List<org.example.pcroom.feature.pcroom.dto.StructureDto>> getStructures(@PathVariable Long pcroomId) {
         return ResponseEntity.ok(pcroomService.getStructures(pcroomId));
+    }
+
+    @PostMapping(value = "/auto-layout", consumes = "multipart/form-data")
+    @Operation(summary = "AI 도면 자동 분석", description = "도면 이미지를 받아 AI 서버에 전달하고 좌표 배열(JSON)을 반환한다.")
+    public ResponseEntity<String> autoLayout(@RequestParam("file") MultipartFile file) throws Exception {
+        return ResponseEntity.ok(aiService.analyzeBlueprint(file));
     }
 }

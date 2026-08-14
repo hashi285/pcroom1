@@ -8,6 +8,7 @@ import org.example.pcroom.feature.manager.repository.CompetitorRelationRepositor
 import org.example.pcroom.feature.manager.service.ManagerService;
 import org.example.pcroom.global.config.security.CustomUserDetails;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
@@ -17,6 +18,7 @@ import java.util.List;
 @RequestMapping("api/manager-favorites")
 @RequiredArgsConstructor
 @Tag(name = "피시방 매니저 API(경쟁 피시방 등록 관련)", description = "피시방 매니저가 경쟁 피시방을 등록/조회/삭제합니다.")
+@PreAuthorize("hasAnyRole('OWNER', 'ADMIN')")
 public class ManagerPcroomController {
 
     private final ManagerService managerService;

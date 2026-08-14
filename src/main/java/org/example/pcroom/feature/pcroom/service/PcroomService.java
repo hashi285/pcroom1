@@ -35,6 +35,13 @@ public class PcroomService {
     private final PcroomStatusCacheRepository pcroomStatusCacheRepository;
     private final PcroomSeatStatusCacheRepository pcroomSeatStatusCacheRepository;
     private final PcroomStructureRepository pcroomStructureRepository;
+    private final org.example.pcroom.feature.manager.repository.PcroomManagerRepository pcroomManagerRepository;
+
+    private void validateOwnership(Long userId, Long pcroomId) {
+        if (!pcroomManagerRepository.existsByUserIdAndPcroomId(userId, pcroomId)) {
+            throw new org.springframework.security.access.AccessDeniedException("해당 피시방에 대한 권한이 없습니다.");
+        }
+    }
 
 
     /**
@@ -122,12 +129,14 @@ public class PcroomService {
      * 정책: 좌석 입력 개수 != 등록된 수량 → 예외 처리
      */
     @Transactional
-    public List<SeatsDto> registerNewSeat(List<SeatsDto> seatsDtos) {
+    public List<SeatsDto> registerNewSeat(Long userId, List<SeatsDto> seatsDtos) {
 
         String nameOfPcroom = seatsDtos.getFirst().getNameOfPcroom();
 
         Pcroom pcroom = pcroomRepository.findByNameOfPcroom(nameOfPcroom)
                 .orElseThrow(() -> new IllegalArgumentException("해당 피시방 없음: " + nameOfPcroom));
+
+        validateOwnership(userId, pcroom.getPcroomId());
 
         int seatNum = pcroom.getSeatCount();
 
@@ -190,7 +199,9 @@ public class PcroomService {
     }
 
     @Transactional
-    public void saveStructures(Long pcroomId, List<StructureDto> dtos) {
+    public void saveStructures(Long userId, Long pcroomId, List<StructureDto> dtos) {
+        validateOwnership(userId, pcroomId);
+        
         Pcroom pcroom = pcroomRepository.findById(pcroomId)
                 .orElseThrow(() -> new IllegalArgumentException("해당 피시방 없음: " + pcroomId));
         

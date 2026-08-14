@@ -25,7 +25,7 @@ public class CustomUserDetailsService implements UserDetailsService {
         return new CustomUserDetails(user.getUserId(),           // userId
                 user.getEmail(),        // username
                 user.getPassword(),     // password
-                Collections.emptyList() // 권한 리스트 (필요시 GrantedAuthority 추가)
+                java.util.Collections.singletonList(new org.springframework.security.core.authority.SimpleGrantedAuthority("ROLE_" + user.getRole().name()))
         );
     }
 }
